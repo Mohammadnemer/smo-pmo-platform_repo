@@ -198,6 +198,16 @@ export function AlertTriangleIcon(props: IconProps) {
   );
 }
 
+export function AlertCircleIcon(props: IconProps) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" {...props}>
+      <circle cx="8" cy="8" r="6.1" fill="none" stroke="currentColor" strokeWidth="1.3" />
+      <line x1="8" y1="4.9" x2="8" y2="8.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <circle cx="8" cy="10.9" r="0.75" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function PresentationIcon(props: IconProps) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" {...props}>

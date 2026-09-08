@@ -12,6 +12,7 @@
     "portfolios": "Portfolios",
     "programs": "Programs",
     "risk": "Risk",
+    "issues": "Issues",
     "executiveDashboard": "Dashboard",
     "workflow": "Workflow",
     "rollup": "Roll-up",
@@ -166,6 +167,54 @@
       "register": {
         "title": "Risk register",
         "empty": "The risk register is not wired up yet — risks are logged on each project’s RAID board for now."
+      }
+    },
+    "issues": {
+      "title": "Issues",
+      "lead": "Every open issue across the PMO — the RAID items logged as issues on a portfolio, a program or a project, worst first.",
+      "summary": {
+        "open": "Open issues",
+        "highSeverity": "High or critical",
+        "overdue": "Past due"
+      },
+      "log": {
+        "title": "Issue log"
+      },
+      "filters": {
+        "severity": "Severity",
+        "allSeverities": "All severities",
+        "project": "Project",
+        "allProjects": "All projects",
+        "openOnly": "Open only"
+      },
+      "columns": {
+        "title": "Issue",
+        "scope": "Raised on",
+        "severity": "Severity",
+        "status": "Status",
+        "due": "Due"
+      },
+      "statuses": {
+        "open": "Open",
+        "mitigating": "Mitigating",
+        "closed": "Closed"
+      },
+      "loading": "Loading issues…",
+      "error": "Could not load issues.",
+      "empty": "No issues match these filters.",
+      "unscoped": "Not linked",
+      "overdue": "overdue",
+      "form": {
+        "title": "Log an issue",
+        "project": "Project",
+        "selectProject": "Select a project",
+        "issueTitle": "Issue",
+        "severity": "Severity",
+        "dueDate": "Due date",
+        "description": "Description",
+        "create": "Log issue",
+        "creating": "Logging…",
+        "error": "Could not log the issue."
       }
     },
     "projectWorkspace": {
