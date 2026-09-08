@@ -57,16 +57,20 @@ using (var scope = app.Services.CreateScope())
 
     var tenantId = Guid.Parse(app.Configuration["DefaultTenantId"] ?? "00000000-0000-0000-0000-000000000001");
     var tenantName = app.Configuration["DefaultTenantName"] ?? "Default Tenant";
+
+    // "Tenants" itself is RLS-protected (TenantId = app.current_tenant_id()), so the
+    // session variable has to already match the row being inserted before this seed's
+    // SaveChanges runs — same requirement as the SMO/PMO dev seeds below, just not
+    // dev-only, since a non-superuser DB role (e.g. Azure) enforces RLS unconditionally.
+    var tenantContext = scope.ServiceProvider.GetRequiredService<ITenantContext>();
+    tenantContext.TenantId = tenantId;
+
     await dbContext.SeedTenantAsync(tenantId, tenantName);
 
     // Dev-only demo scorecard tree (F4) so the SPA has real RAG-varied data to render
-    // against, without a seeded fixture ever reaching a real tenant's database. SMO's
-    // tables FORCE row-level security, so the tenant context has to be set before the
-    // seeder's SaveChanges runs, same as the request pipeline does per-call.
+    // against, without a seeded fixture ever reaching a real tenant's database.
     if (app.Environment.IsDevelopment())
     {
-        var devTenantContext = scope.ServiceProvider.GetRequiredService<ITenantContext>();
-        devTenantContext.TenantId = tenantId;
         var smoDbContext = scope.ServiceProvider.GetRequiredService<SmoDbContext>();
         await SmoDemoSeed.SeedAsync(smoDbContext);
 
