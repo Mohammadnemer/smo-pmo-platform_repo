@@ -28,6 +28,7 @@ public sealed class SmoDbContext : DbContext
 
     public DbSet<Strategy> Strategies => Set<Strategy>();
     public DbSet<Perspective> Perspectives => Set<Perspective>();
+    public DbSet<StrategicTheme> StrategicThemes => Set<StrategicTheme>();
     public DbSet<Objective> Objectives => Set<Objective>();
     public DbSet<Kpi> Kpis => Set<Kpi>();
     public DbSet<KpiMeasurement> KpiMeasurements => Set<KpiMeasurement>();
@@ -64,6 +65,21 @@ public sealed class SmoDbContext : DbContext
             entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });
 
+        modelBuilder.Entity<StrategicTheme>(entity =>
+        {
+            entity.ToTable("SmoStrategicThemes");
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.NameAr).HasMaxLength(200);
+            entity.Property(e => e.Code).HasMaxLength(20);
+            entity.Property(e => e.TenantId).IsRequired();
+            entity.HasIndex(e => new { e.TenantId, e.StrategyId });
+            entity.HasOne(e => e.Strategy)
+                .WithMany()
+                .HasForeignKey(e => e.StrategyId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
+        });
+
         modelBuilder.Entity<Objective>(entity =>
         {
             entity.ToTable("SmoObjectives");
@@ -73,10 +89,17 @@ public sealed class SmoDbContext : DbContext
             entity.Property(e => e.Health).HasConversion<string>().HasMaxLength(20);
             entity.Property(e => e.HealthScore).HasPrecision(9, 4);
             entity.HasIndex(e => new { e.TenantId, e.PerspectiveId });
+            entity.HasIndex(e => new { e.TenantId, e.StrategicThemeId });
             entity.HasOne(e => e.Perspective)
                 .WithMany(e => e.Objectives)
                 .HasForeignKey(e => e.PerspectiveId)
                 .OnDelete(DeleteBehavior.Cascade);
+            // SetNull, not Cascade: a theme is a grouping label, so retiring one must
+            // un-theme its objectives, never delete them along with it.
+            entity.HasOne(e => e.StrategicTheme)
+                .WithMany(e => e.Objectives)
+                .HasForeignKey(e => e.StrategicThemeId)
+                .OnDelete(DeleteBehavior.SetNull);
             entity.HasQueryFilter(e => e.TenantId == CurrentTenantId);
         });
 

@@ -15,6 +15,7 @@ import {
   FlagIcon,
   FolderIcon,
   GaugeIcon,
+  GridIcon,
   InboxIcon,
   LayersIcon,
   ListIcon,
@@ -61,6 +62,7 @@ const workspaceNavItems: Record<WorkspaceId, NavEntry[]> = {
     { to: '/smo/initiatives', key: 'nav.initiatives', Icon: FlagIcon },
     { to: '/smo/map', key: 'nav.strategyMap', Icon: MapIcon },
     { to: '/smo/scorecard', key: 'nav.scorecard', Icon: GaugeIcon },
+    { to: '/smo/alignment', key: 'nav.alignmentGrid', Icon: GridIcon },
   ],
   pmo: [
     { to: '/pmo/home', key: 'nav.projectsOverview', end: true, Icon: FolderIcon },

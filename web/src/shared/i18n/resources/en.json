@@ -1,5 +1,7 @@
 {
-  "app": { "name": "SMO + PMO Platform" },
+  "app": {
+    "name": "SMO + PMO Platform"
+  },
   "nav": {
     "home": "Home",
     "strategyOverview": "Strategy",
@@ -13,7 +15,8 @@
     "executiveDashboard": "Dashboard",
     "workflow": "Workflow",
     "rollup": "Roll-up",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "alignmentGrid": "Alignment grid"
   },
   "topbar": {
     "searchPlaceholder": "Search projects, risks, objectives",
@@ -251,6 +254,36 @@
     "notifications": {
       "title": "Notifications",
       "body": "In-app notification center lands alongside session B8."
+    },
+    "alignmentGrid": {
+      "title": "Alignment grid",
+      "hint": "Objectives sit at the intersection of perspective (rows) and strategic theme (columns). Select one to trace its full cause-effect chain, from learning up to financial outcomes.",
+      "loading": "Loading the alignment grid…",
+      "error": "Could not load the alignment grid from the SMO API.",
+      "empty": "No strategy has been created for this tenant yet.",
+      "traceHint": "Select an objective to trace its chain",
+      "clearTrace": "Clear trace",
+      "emptyCell": "no objective",
+      "unthemed": "No theme",
+      "summary": {
+        "title": "Map summary",
+        "body": "Select any objective in the grid to see its cause-effect chain, KPIs and initiatives.",
+        "objectives": "Objectives",
+        "links": "Causal links",
+        "atRisk": "At risk",
+        "offTrack": "Off track"
+      },
+      "detail": {
+        "close": "Close",
+        "chain": "Cause-effect chain",
+        "noChain": "This objective is not linked to any other yet.",
+        "kpis": "KPIs",
+        "noKpis": "No KPIs on this objective yet.",
+        "initiatives": "Initiatives",
+        "noInitiatives": "No initiatives on this objective yet.",
+        "target": "Target",
+        "actual": "Actual"
+      }
     }
   }
 }

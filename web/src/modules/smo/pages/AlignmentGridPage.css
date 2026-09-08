@@ -1,0 +1,562 @@
+/* Alignment grid (perspective × strategic theme).
+
+   Every directional property here is logical (inline-start/inline-end, margin-inline,
+   inset-inline) rather than left/right, so the AR/RTL pass is the browser's job and not a
+   second stylesheet — CLAUDE.md's i18n non-negotiable. The one physical measurement left
+   is in the arrow maths (AlignmentGridPage.tsx), which uses offsetLeft/offsetTop; those
+   are measured from the wrapper's left edge in both directions, so they mirror correctly
+   on their own. */
+
+.alignment-grid-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+
+  /* Queried by the layout rule at the bottom of this file. A media query would be wrong
+     here: what decides whether the grid and the panel fit side by side is the width of the
+     content column, and that is the viewport minus a left nav that the user can collapse.
+     The container is the thing that actually knows. */
+  container-type: inline-size;
+  container-name: alignment-grid;
+}
+
+.alignment-grid-page__heading h1 {
+  margin: 0 0 4px;
+}
+
+.alignment-grid-page__hint {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  max-width: 78ch;
+}
+
+/* Stacked by default; the container query at the bottom puts the panel alongside the grid
+   once there is genuinely room for both. */
+.alignment-grid-page__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.alignment-grid-page__grid-card {
+  flex: 1;
+  min-width: 0;
+  padding: 18px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────────── */
+
+.alignment-grid-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.alignment-grid-page__legend,
+.alignment-grid-page__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.alignment-grid-page__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.alignment-grid-page__trace-hint {
+  color: var(--text-mute);
+}
+
+.alignment-grid-page__clear {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.alignment-grid-page__clear:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.alignment-grid-page__dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.alignment-grid-page__dot--ok {
+  background: var(--ok);
+}
+.alignment-grid-page__dot--warn {
+  background: var(--warn);
+}
+.alignment-grid-page__dot--risk {
+  background: var(--risk);
+}
+.alignment-grid-page__dot--neutral {
+  background: var(--text-mute);
+}
+
+/* ── Grid ────────────────────────────────────────────────────────────── */
+
+/* The grid keeps a usable minimum column width and scrolls rather than crushing cards
+   when a tenant adds a fifth or sixth theme. Only this element scrolls — the page body
+   never scrolls sideways. */
+.alignment-grid-page__scroll {
+  overflow-x: auto;
+  padding-block-end: 6px;
+  flex: 1;
+}
+
+/* Fills the scroller normally (a block box's auto width), and `min-content` — the grid's
+   label column plus its minimum theme tracks — stops it collapsing below that. So the
+   scroller only actually scrolls when the themes genuinely do not fit; sizing this
+   `max-content` instead made it overflow permanently, even with room to spare. */
+.alignment-grid-page__wrapper {
+  position: relative;
+  min-inline-size: min-content;
+}
+
+.alignment-grid-page__edges {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 0;
+}
+
+.alignment-grid-page__grid {
+  display: grid;
+  grid-template-columns: 130px repeat(var(--column-count), minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.alignment-grid-page__code {
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-mute);
+}
+
+.alignment-grid-page__column-head {
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.alignment-grid-page__column-name {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.alignment-grid-page__row-head {
+  padding: 14px 12px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+}
+
+.alignment-grid-page__row-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  line-height: 1.35;
+}
+
+.alignment-grid-page__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-block-size: 82px;
+}
+
+.alignment-grid-page__cell--empty {
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--text-mute);
+}
+
+/* ── Objective card ──────────────────────────────────────────────────── */
+
+.alignment-grid-page__objective {
+  /* Positioned so the card paints above the SVG the arrows are drawn into — the arrows
+     should read as running behind the cards they connect, not across them. */
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 12px 13px;
+  border: 1px solid var(--border-strong);
+  border-inline-start-width: 4px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 9px;
+  transition:
+    opacity 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+
+.alignment-grid-page__objective--ok {
+  border-inline-start-color: var(--ok);
+}
+.alignment-grid-page__objective--warn {
+  border-inline-start-color: var(--warn);
+}
+.alignment-grid-page__objective--risk {
+  border-inline-start-color: var(--risk);
+}
+.alignment-grid-page__objective--neutral {
+  border-inline-start-color: var(--border-strong);
+}
+
+.alignment-grid-page__objective:hover {
+  border-color: var(--text-mute);
+}
+
+.alignment-grid-page__objective--dimmed {
+  opacity: 0.28;
+}
+
+.alignment-grid-page__objective--selected {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+
+.alignment-grid-page__objective:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.alignment-grid-page__objective-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* The dot is the first flex item on a line of wrapping text, so it needs nudging onto the
+   first line's optical centre rather than its box top. */
+.alignment-grid-page__objective-title .alignment-grid-page__dot {
+  margin-block-start: 5px;
+}
+
+.alignment-grid-page__objective-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ── Side panel ──────────────────────────────────────────────────────── */
+
+.alignment-grid-page__panel {
+  flex: none;
+  align-self: stretch;
+  overflow: hidden;
+  display: flex;
+}
+
+.alignment-grid-page__panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 22px 26px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.alignment-grid-page__panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.alignment-grid-page__panel-kicker {
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.alignment-grid-page__close {
+  inline-size: 26px;
+  block-size: 26px;
+  flex: none;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-mute);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.alignment-grid-page__close:hover {
+  background: var(--hover-bg);
+  color: var(--text);
+}
+
+.alignment-grid-page__panel-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.alignment-grid-page__panel-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.alignment-grid-page__target-state {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.alignment-grid-page__panel-lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.alignment-grid-page__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.alignment-grid-page__stat {
+  padding: 14px 15px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.alignment-grid-page__stat-value {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.alignment-grid-page__stat-value--warn {
+  color: var(--warn);
+}
+.alignment-grid-page__stat-value--risk {
+  color: var(--risk);
+}
+
+.alignment-grid-page__stat-label {
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.alignment-grid-page__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alignment-grid-page__section h3 {
+  margin: 0;
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.alignment-grid-page__section-empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-mute);
+}
+
+/* ── Chain ───────────────────────────────────────────────────────────── */
+
+.alignment-grid-page__chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.alignment-grid-page__chain li {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+.alignment-grid-page__chain li.is-selected {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.alignment-grid-page__chain-perspective {
+  flex: none;
+  inline-size: 8ch;
+  font-size: 11px;
+  color: var(--text-mute);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alignment-grid-page__chain li.is-selected .alignment-grid-page__chain-perspective {
+  color: inherit;
+}
+
+/* ── KPIs & initiatives ──────────────────────────────────────────────── */
+
+.alignment-grid-page__kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.alignment-grid-page__kpi-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.alignment-grid-page__kpi-values {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  flex-wrap: wrap;
+}
+
+.alignment-grid-page__kpi-values b {
+  color: var(--text);
+  font-weight: 500;
+  /* The value is forced dir="ltr" so a number keeps its digits in order inside Arabic
+     prose; isolating it stops that override from reordering the label around it. */
+  unicode-bidi: isolate;
+}
+
+.alignment-grid-page__bar {
+  display: block;
+  block-size: 5px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.alignment-grid-page__bar-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 3px;
+}
+
+.alignment-grid-page__bar-fill--ok {
+  background: var(--ok);
+}
+.alignment-grid-page__bar-fill--warn {
+  background: var(--warn);
+}
+.alignment-grid-page__bar-fill--risk {
+  background: var(--risk);
+}
+.alignment-grid-page__bar-fill--neutral {
+  background: var(--text-mute);
+}
+
+.alignment-grid-page__initiative {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+/* ── Side-by-side layout ─────────────────────────────────────────────── */
+
+/* 1330px is what the two genuinely need, added up rather than guessed: the grid's own
+   min-content is 130px of row labels + four 180px theme tracks + four 10px gaps = 890px,
+   the card adds 40px of padding, and the panel plus its gap is 396px. Below that the panel
+   goes under the grid rather than squeezing it into a permanently scrolling sliver. Four
+   themes is the default; a tenant with more scrolls the grid, which is the intended
+   trade-off — the page body itself still never scrolls sideways. */
+@container alignment-grid (min-width: 1330px) {
+  .alignment-grid-page__layout {
+    flex-direction: row;
+  }
+
+  .alignment-grid-page__panel {
+    inline-size: 380px;
+  }
+}

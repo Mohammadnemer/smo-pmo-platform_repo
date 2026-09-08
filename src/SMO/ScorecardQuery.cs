@@ -4,7 +4,7 @@ namespace SmoPmo.Smo;
 
 /// <summary>
 /// Builds the scorecard aggregate — strategy → perspectives → objectives → KPIs (with
-/// trend) + initiatives — in a fixed number of queries regardless of tree size. Six
+/// trend) + initiatives + themes — in a fixed number of queries regardless of tree size. Seven
 /// set-based reads, then assembly in memory; deliberately never one query per node.
 /// </summary>
 internal static class ScorecardQuery
@@ -38,6 +38,16 @@ internal static class ScorecardQuery
             .ToListAsync(ct);
 
         var perspectiveIds = perspectives.Select(e => e.Id).ToList();
+
+        // Themes hang off the strategy, not the perspective, so they are read whole rather
+        // than filtered by what is in view: an objective in a visible perspective may carry
+        // a theme whose other objectives are all hidden, and the grid still needs that column.
+        var themes = await db.StrategicThemes
+            .AsNoTracking()
+            .Where(e => e.StrategyId == strategyId)
+            .OrderBy(e => e.DisplayOrder)
+            .ThenBy(e => e.Name)
+            .ToListAsync(ct);
 
         var objectives = await db.Objectives
             .AsNoTracking()
@@ -135,6 +145,7 @@ internal static class ScorecardQuery
             strategy.ToResponse(),
             RagCounts.From(allStatuses),
             scorecardPerspectives,
-            objectiveLinks.Select(SmoMapping.ToResponse).ToList());
+            objectiveLinks.Select(SmoMapping.ToResponse).ToList(),
+            themes.Select(SmoMapping.ToResponse).ToList());
     }
 }

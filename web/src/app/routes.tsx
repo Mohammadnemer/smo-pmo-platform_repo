@@ -9,6 +9,7 @@ import { ProjectWorkspacePage } from '../modules/pmo/pages/ProjectWorkspacePage'
 import { RiskPage } from '../modules/pmo/pages/RiskPage';
 import { ExecutivePage } from '../modules/rollup/pages/ExecutivePage';
 import { RollupPage } from '../modules/rollup/pages/RollupPage';
+import { AlignmentGridPage } from '../modules/smo/pages/AlignmentGridPage';
 import { InitiativesPage } from '../modules/smo/pages/InitiativesPage';
 import { ScorecardPage } from '../modules/smo/pages/ScorecardPage';
 import { StrategyMapPage } from '../modules/smo/pages/StrategyMapPage';
@@ -29,6 +30,7 @@ export function AppRouter() {
             <Route path="/smo/initiatives" element={<InitiativesPage />} />
             <Route path="/smo/map" element={<StrategyMapPage />} />
             <Route path="/smo/scorecard" element={<ScorecardPage />} />
+            <Route path="/smo/alignment" element={<AlignmentGridPage />} />
 
             <Route path="/pmo" element={<Navigate to="/pmo/home" replace />} />
             <Route path="/pmo/home" element={<ProjectsPage />} />

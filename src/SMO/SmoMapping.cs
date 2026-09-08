@@ -29,9 +29,21 @@ internal static class SmoMapping
         entity.IsHidden = model.IsHidden;
     }
 
+    public static void Apply(this StrategicTheme entity, StrategicThemeWriteModel model)
+    {
+        entity.StrategyId = model.StrategyId;
+        entity.Name = model.Name.Trim();
+        entity.NameAr = Clean(model.NameAr);
+        entity.Description = Clean(model.Description);
+        entity.DescriptionAr = Clean(model.DescriptionAr);
+        entity.Code = Clean(model.Code);
+        entity.DisplayOrder = model.DisplayOrder;
+    }
+
     public static void Apply(this Objective entity, ObjectiveWriteModel model)
     {
         entity.PerspectiveId = model.PerspectiveId;
+        entity.StrategicThemeId = model.StrategicThemeId;
         entity.Name = model.Name.Trim();
         entity.NameAr = Clean(model.NameAr);
         entity.Description = Clean(model.Description);
@@ -92,10 +104,14 @@ internal static class SmoMapping
         e.Id, e.StrategyId, e.Name, e.NameAr, e.Description, e.DescriptionAr,
         e.DisplayOrder, e.IsHidden);
 
+    public static StrategicThemeResponse ToResponse(this StrategicTheme e) => new(
+        e.Id, e.StrategyId, e.Name, e.NameAr, e.Description, e.DescriptionAr,
+        e.Code, e.DisplayOrder);
+
     public static ObjectiveResponse ToResponse(this Objective e) => new(
         e.Id, e.PerspectiveId, e.Name, e.NameAr, e.Description, e.DescriptionAr,
         e.TargetState, e.OwnerUserId, e.OrgUnitId, e.DisplayOrder,
-        e.Health, e.HealthScore, e.HealthComputedAt);
+        e.Health, e.HealthScore, e.HealthComputedAt, e.StrategicThemeId);
 
     public static KpiResponse ToResponse(this Kpi e)
     {

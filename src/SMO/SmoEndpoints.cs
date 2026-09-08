@@ -31,6 +31,7 @@ public static class SmoEndpoints
 
         MapStrategies(group);
         MapPerspectives(group);
+        MapStrategicThemes(group);
         MapObjectives(group);
         MapKpis(group);
         MapInitiatives(group);
@@ -203,6 +204,93 @@ public static class SmoEndpoints
         }).RequireAuthorization(SmoPolicies.Write);
     }
 
+    // ───────────────────── Strategic themes (alignment grid) ─────────────────────
+    // The cross-perspective storylines an objective may belong to (PRD §6.1.2) — the
+    // alignment grid's columns. Full CRUD like perspectives: without POST there would be
+    // no way to author a theme at all, and assignment then happens through the existing
+    // objective PUT (ObjectiveWriteModel.StrategicThemeId).
+
+    private static void MapStrategicThemes(RouteGroupBuilder group)
+    {
+        group.MapGet("/strategic-themes", async (SmoDbContext db, CancellationToken ct, Guid? strategyId = null) =>
+        {
+            var entities = await db.StrategicThemes
+                .AsNoTracking()
+                .Where(e => strategyId == null || e.StrategyId == strategyId)
+                .OrderBy(e => e.DisplayOrder)
+                .ThenBy(e => e.Name)
+                .ToListAsync(ct);
+
+            return Results.Ok(entities.Select(SmoMapping.ToResponse).ToList());
+        });
+
+        group.MapGet("/strategic-themes/{id:guid}", async (Guid id, SmoDbContext db, CancellationToken ct) =>
+        {
+            var entity = await db.StrategicThemes.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id, ct);
+            return entity is null ? NotFound("strategic theme", id) : Results.Ok(entity.ToResponse());
+        });
+
+        group.MapPost("/strategic-themes", async (StrategicThemeWriteModel model, SmoDbContext db, CancellationToken ct) =>
+        {
+            if (SmoValidation.Validate(model) is { } errors)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            if (!await db.Strategies.AnyAsync(e => e.Id == model.StrategyId, ct))
+            {
+                return UnknownParent(nameof(model.StrategyId), "strategy");
+            }
+
+            var entity = new StrategicTheme();
+            entity.Apply(model);
+            db.StrategicThemes.Add(entity);
+            await db.SaveChangesAsync(ct);
+
+            return Results.Created($"/api/smo/strategic-themes/{entity.Id}", entity.ToResponse());
+        }).RequireAuthorization(SmoPolicies.Write);
+
+        group.MapPut("/strategic-themes/{id:guid}", async (Guid id, StrategicThemeWriteModel model, SmoDbContext db, CancellationToken ct) =>
+        {
+            if (SmoValidation.Validate(model) is { } errors)
+            {
+                return Results.ValidationProblem(errors);
+            }
+
+            var entity = await db.StrategicThemes.FirstOrDefaultAsync(e => e.Id == id, ct);
+            if (entity is null)
+            {
+                return NotFound("strategic theme", id);
+            }
+
+            if (!await db.Strategies.AnyAsync(e => e.Id == model.StrategyId, ct))
+            {
+                return UnknownParent(nameof(model.StrategyId), "strategy");
+            }
+
+            entity.Apply(model);
+            await db.SaveChangesAsync(ct);
+
+            return Results.Ok(entity.ToResponse());
+        }).RequireAuthorization(SmoPolicies.Write);
+
+        // Deleting a theme un-themes its objectives (FK ON DELETE SET NULL) rather than
+        // deleting them — see SmoDbContext. The grid then shows them in its unthemed column.
+        group.MapDelete("/strategic-themes/{id:guid}", async (Guid id, SmoDbContext db, CancellationToken ct) =>
+        {
+            var entity = await db.StrategicThemes.FirstOrDefaultAsync(e => e.Id == id, ct);
+            if (entity is null)
+            {
+                return NotFound("strategic theme", id);
+            }
+
+            db.StrategicThemes.Remove(entity);
+            await db.SaveChangesAsync(ct);
+
+            return Results.NoContent();
+        }).RequireAuthorization(SmoPolicies.Write);
+    }
+
     // ───────────────────────────── Objectives ─────────────────────────────
 
     private static void MapObjectives(RouteGroupBuilder group)
@@ -252,6 +340,12 @@ public static class SmoEndpoints
                 return UnknownParent(nameof(model.PerspectiveId), "perspective");
             }
 
+            if (model.StrategicThemeId is { } themeId
+                && !await db.StrategicThemes.AnyAsync(e => e.Id == themeId, ct))
+            {
+                return UnknownParent(nameof(model.StrategicThemeId), "strategic theme");
+            }
+
             var entity = new Objective();
             entity.Apply(model);
             db.Objectives.Add(entity);
@@ -276,6 +370,12 @@ public static class SmoEndpoints
             if (!await db.Perspectives.AnyAsync(e => e.Id == model.PerspectiveId, ct))
             {
                 return UnknownParent(nameof(model.PerspectiveId), "perspective");
+            }
+
+            if (model.StrategicThemeId is { } themeId
+                && !await db.StrategicThemes.AnyAsync(e => e.Id == themeId, ct))
+            {
+                return UnknownParent(nameof(model.StrategicThemeId), "strategic theme");
             }
 
             entity.Apply(model);

@@ -8,6 +8,7 @@ namespace SmoPmo.Smo;
 internal static class SmoValidation
 {
     private const int MaxName = 200;
+    private const int MaxCode = 20;
 
     public static Dictionary<string, string[]>? Validate(StrategyWriteModel model)
     {
@@ -28,6 +29,16 @@ internal static class SmoValidation
         var errors = new ErrorBag();
         errors.Name(model.Name);
         errors.MaxLength(nameof(model.NameAr), model.NameAr, MaxName);
+        errors.Required(nameof(model.StrategyId), model.StrategyId);
+        return errors.Result;
+    }
+
+    public static Dictionary<string, string[]>? Validate(StrategicThemeWriteModel model)
+    {
+        var errors = new ErrorBag();
+        errors.Name(model.Name);
+        errors.MaxLength(nameof(model.NameAr), model.NameAr, MaxName);
+        errors.MaxLength(nameof(model.Code), model.Code, MaxCode);
         errors.Required(nameof(model.StrategyId), model.StrategyId);
         return errors.Result;
     }

@@ -37,6 +37,19 @@ export interface PerspectiveResponse {
   isHidden: boolean;
 }
 
+/** A cross-perspective storyline — the alignment grid's columns. */
+export interface StrategicThemeResponse {
+  id: string;
+  strategyId: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  /** Short display handle shown on the grid's column header, e.g. 'TH-01'. */
+  code: string | null;
+  displayOrder: number;
+}
+
 export interface ObjectiveResponse {
   id: string;
   perspectiveId: string;
@@ -51,6 +64,8 @@ export interface ObjectiveResponse {
   health: RagStatus;
   healthScore: number | null;
   healthComputedAt: string | null;
+  /** Null for an objective that belongs to no theme — the grid's unthemed column. */
+  strategicThemeId: string | null;
 }
 
 export interface KpiResponse {
@@ -142,4 +157,5 @@ export interface ScorecardResponse {
   kpiRagCounts: RagCounts;
   perspectives: ScorecardPerspective[];
   objectiveLinks: ObjectiveLinkResponse[];
+  strategicThemes: StrategicThemeResponse[];
 }

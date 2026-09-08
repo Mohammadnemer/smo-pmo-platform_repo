@@ -24,6 +24,15 @@ public sealed record PerspectiveWriteModel(
     int DisplayOrder,
     bool IsHidden);
 
+public sealed record StrategicThemeWriteModel(
+    Guid StrategyId,
+    string Name,
+    string? NameAr,
+    string? Description,
+    string? DescriptionAr,
+    string? Code,
+    int DisplayOrder);
+
 public sealed record ObjectiveWriteModel(
     Guid PerspectiveId,
     string Name,
@@ -33,7 +42,8 @@ public sealed record ObjectiveWriteModel(
     string? TargetState,
     Guid? OwnerUserId,
     Guid? OrgUnitId,
-    int DisplayOrder);
+    int DisplayOrder,
+    Guid? StrategicThemeId = null);
 
 public sealed record KpiWriteModel(
     Guid ObjectiveId,
@@ -103,6 +113,16 @@ public sealed record PerspectiveResponse(
     int DisplayOrder,
     bool IsHidden);
 
+public sealed record StrategicThemeResponse(
+    Guid Id,
+    Guid StrategyId,
+    string Name,
+    string? NameAr,
+    string? Description,
+    string? DescriptionAr,
+    string? Code,
+    int DisplayOrder);
+
 public sealed record ObjectiveResponse(
     Guid Id,
     Guid PerspectiveId,
@@ -116,7 +136,8 @@ public sealed record ObjectiveResponse(
     int DisplayOrder,
     RagStatus Health,
     decimal? HealthScore,
-    DateTimeOffset? HealthComputedAt);
+    DateTimeOffset? HealthComputedAt,
+    Guid? StrategicThemeId);
 
 public sealed record KpiResponse(
     Guid Id,
@@ -183,7 +204,12 @@ public sealed record ScorecardResponse(
     // The strategy map's cause-effect edges (F5) — only edges between two objectives that
     // are both in view, so hiding a perspective (includeHidden=false) can't leave a
     // dangling arrow pointing at an objective the response never sent.
-    IReadOnlyList<ObjectiveLinkResponse> ObjectiveLinks);
+    IReadOnlyList<ObjectiveLinkResponse> ObjectiveLinks,
+    // The alignment grid's columns (PRD §6.1.2). Sent with the aggregate rather than
+    // fetched separately so that view, like the scorecard and map, is one round trip
+    // (ADR 0002). Empty for a tenant that never created a theme — the grid then renders
+    // its unthemed column alone.
+    IReadOnlyList<StrategicThemeResponse> StrategicThemes);
 
 public sealed record ScorecardPerspective(
     PerspectiveResponse Perspective,

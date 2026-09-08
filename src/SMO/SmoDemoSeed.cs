@@ -36,6 +36,25 @@ public static class SmoDemoSeed
         // after the tree exists) can reference them without a second round trip.
         var objectivesByName = new Dictionary<string, Guid>(StringComparer.Ordinal);
 
+        // Strategic themes — the alignment grid's columns. Seeded before the perspectives
+        // so each ObjectiveDef can claim its theme by code as the tree is built.
+        var themeIdsByCode = new Dictionary<string, Guid>(StringComparer.Ordinal);
+
+        foreach (var themeDef in Themes)
+        {
+            var theme = new StrategicTheme
+            {
+                Id = Guid.NewGuid(),
+                StrategyId = strategy.Id,
+                Code = themeDef.Code,
+                Name = themeDef.Name,
+                NameAr = themeDef.NameAr,
+                DisplayOrder = themeDef.DisplayOrder
+            };
+            db.StrategicThemes.Add(theme);
+            themeIdsByCode[themeDef.Code] = theme.Id;
+        }
+
         foreach (var perspectiveDef in Perspectives)
         {
             var perspective = new Perspective
@@ -57,7 +76,8 @@ public static class SmoDemoSeed
                     Name = objectiveDef.Name,
                     NameAr = objectiveDef.NameAr,
                     TargetState = objectiveDef.TargetState,
-                    DisplayOrder = objectiveDef.DisplayOrder
+                    DisplayOrder = objectiveDef.DisplayOrder,
+                    StrategicThemeId = objectiveDef.ThemeCode is { } themeCode ? themeIdsByCode[themeCode] : null
                 };
                 db.Objectives.Add(objective);
                 objectivesByName[objectiveDef.Name] = objective.Id;
@@ -153,7 +173,21 @@ public static class SmoDemoSeed
 
     private sealed record ObjectiveDef(
         string Name, string NameAr, string TargetState, int DisplayOrder,
-        KpiDef[] Kpis, InitiativeDef? Initiative = null);
+        KpiDef[] Kpis, InitiativeDef? Initiative = null, string? ThemeCode = null);
+
+    private sealed record ThemeDef(string Code, string Name, string NameAr, int DisplayOrder);
+
+    // Four value-creation storylines cutting across the perspectives below (PRD §6.1.2) —
+    // the alignment grid's columns. Every seeded objective claims one, and every theme
+    // spans at least two perspectives, which is the whole point of the axis: a theme that
+    // lived inside a single perspective would just be a sub-perspective.
+    private static readonly ThemeDef[] Themes =
+    [
+        new ThemeDef("TH-01", "Revenue growth", "نمو الإيرادات", 0),
+        new ThemeDef("TH-02", "Customer trust", "ثقة العملاء", 1),
+        new ThemeDef("TH-03", "Delivery excellence", "تميز التنفيذ", 2),
+        new ThemeDef("TH-04", "Data & talent", "البيانات والكفاءات", 3)
+    ];
 
     private sealed record PerspectiveDef(string Name, string NameAr, int DisplayOrder, ObjectiveDef[] Objectives);
 
@@ -179,7 +213,8 @@ public static class SmoDemoSeed
                 new InitiativeDef(
                     "Enterprise Upsell Program", "برنامج توسيع الحسابات الكبرى",
                     "VP Sales", 250000m, "Drive ARR growth via expansion deals into existing accounts.",
-                    new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31), "Active")),
+                    new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31), "Active"),
+                ThemeCode: "TH-01"),
             new ObjectiveDef(
                 "Improve gross margin", "تحسين هامش الربح الإجمالي",
                 "Gross margin above 55% by 2027", 1,
@@ -187,7 +222,7 @@ public static class SmoDemoSeed
                     new KpiDef("Gross Margin", "هامش الربح الإجمالي", "%",
                         KpiDirection.HigherIsBetter, KpiFrequency.Monthly, 42m, 55m,
                         [45m, 44m, 42m, 40m, 39m, 38m])
-                ])
+                ], ThemeCode: "TH-03")
         ]),
         new PerspectiveDef("Customer", "العملاء", 1,
         [
@@ -205,7 +240,8 @@ public static class SmoDemoSeed
                 new InitiativeDef(
                     "Customer Success Revamp", "إعادة هيكلة نجاح العملاء",
                     "Head of CS", 120000m, "Cut time-to-value and proactively catch at-risk accounts.",
-                    new DateOnly(2026, 2, 1), new DateOnly(2026, 11, 30), "Active")),
+                    new DateOnly(2026, 2, 1), new DateOnly(2026, 11, 30), "Active"),
+                ThemeCode: "TH-02"),
             new ObjectiveDef(
                 "Expand into new markets", "التوسع في أسواق جديدة",
                 "Enter 3 new GCC markets by 2028", 1,
@@ -213,7 +249,7 @@ public static class SmoDemoSeed
                     new KpiDef("New Markets Entered", "الأسواق الجديدة المستهدفة", "markets",
                         KpiDirection.HigherIsBetter, KpiFrequency.Annual, 0m, 3m,
                         [0m, 0m, 0m, 1m, 1m, 1m])
-                ])
+                ], ThemeCode: "TH-01")
         ]),
         new PerspectiveDef("Internal Process", "العمليات الداخلية", 2,
         [
@@ -228,7 +264,8 @@ public static class SmoDemoSeed
                 new InitiativeDef(
                     "Delivery Process Standardization", "توحيد معايير عملية التسليم",
                     "PMO Director", 80000m, "Common stage-gate templates across all delivery teams.",
-                    new DateOnly(2026, 1, 15), new DateOnly(2026, 7, 31), "Approved")),
+                    new DateOnly(2026, 1, 15), new DateOnly(2026, 7, 31), "Approved"),
+                ThemeCode: "TH-03"),
             new ObjectiveDef(
                 "Improve quality / defect rate", "تحسين معدل الجودة",
                 "Defect escape rate below 2%", 1,
@@ -238,7 +275,7 @@ public static class SmoDemoSeed
                         [4m, 3.5m, 3m, 2.5m, 2m, 1.8m]),
                     new KpiDef("First-Time-Right Rate", "معدل الأداء الصحيح من أول مرة", "%",
                         KpiDirection.HigherIsBetter, KpiFrequency.Quarterly, 70m, null, [])
-                ])
+                ], ThemeCode: "TH-02")
         ]),
         new PerspectiveDef("Learning & Growth", "التعلم والنمو", 3,
         [
@@ -249,7 +286,7 @@ public static class SmoDemoSeed
                     new KpiDef("Training Hours per Employee", "ساعات التدريب لكل موظف", "hours",
                         KpiDirection.HigherIsBetter, KpiFrequency.Annual, 15m, 40m,
                         [18m, 22m, 25m, 28m, 31m, 33m])
-                ]),
+                ], ThemeCode: "TH-03"),
             new ObjectiveDef(
                 "Improve digital tool adoption", "تحسين تبني الأدوات الرقمية",
                 "90% of staff actively using the core platform", 1,
@@ -264,7 +301,8 @@ public static class SmoDemoSeed
                 new InitiativeDef(
                     "Unified Platform Rollout", "نشر المنصة الموحدة",
                     "CIO", 300000m, "Retire legacy point tools in favor of one adopted platform.",
-                    new DateOnly(2026, 3, 1), new DateOnly(2027, 2, 28), "Draft"))
+                    new DateOnly(2026, 3, 1), new DateOnly(2027, 2, 28), "Draft"),
+                ThemeCode: "TH-04")
         ])
     ];
 }

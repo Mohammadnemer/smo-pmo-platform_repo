@@ -44,6 +44,37 @@ public sealed class Perspective : BaseEntity
     public ICollection<Objective> Objectives { get; } = new List<Objective>();
 }
 
+/// <summary>
+/// A value-creation storyline that cuts <em>across</em> perspectives — 'Revenue growth',
+/// 'Customer trust' (PRD §6.1.1, §6.1.2). Optional by design: a tenant may run a plain
+/// four-perspective scorecard and never create one, which is why
+/// <see cref="Objective.StrategicThemeId"/> is nullable.
+///
+/// Perspective answers <em>which lens</em> an objective is viewed through; theme answers
+/// <em>which storyline</em> it serves. The two are independent axes, and that is exactly
+/// what the alignment grid renders: perspectives down, themes across.
+/// </summary>
+public sealed class StrategicTheme : BaseEntity
+{
+    public string Name { get; set; } = string.Empty;
+    public string? NameAr { get; set; }
+    public string? Description { get; set; }
+    public string? DescriptionAr { get; set; }
+    public Guid StrategyId { get; set; }
+    public Strategy? Strategy { get; set; }
+
+    /// <summary>
+    /// Short human-facing handle shown on the grid's column header ('TH-01'). Tenant-authored
+    /// rather than derived from <see cref="BaseEntity.Id"/>: it appears in board packs and
+    /// must stay stable and readable, which a GUID prefix is not.
+    /// </summary>
+    public string? Code { get; set; }
+
+    public int DisplayOrder { get; set; }
+
+    public ICollection<Objective> Objectives { get; } = new List<Objective>();
+}
+
 public sealed class Objective : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
@@ -52,6 +83,14 @@ public sealed class Objective : BaseEntity
     public string? DescriptionAr { get; set; }
     public Guid PerspectiveId { get; set; }
     public Perspective? Perspective { get; set; }
+
+    /// <summary>
+    /// Optional theme membership — the alignment grid's column. Null means the objective
+    /// belongs to no storyline yet; the grid renders those in its own trailing column
+    /// rather than dropping them, so an unthemed objective is never invisible.
+    /// </summary>
+    public Guid? StrategicThemeId { get; set; }
+    public StrategicTheme? StrategicTheme { get; set; }
 
     public string? TargetState { get; set; }
     public Guid? OwnerUserId { get; set; }

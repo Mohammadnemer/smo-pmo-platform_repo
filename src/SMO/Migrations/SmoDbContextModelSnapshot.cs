@@ -62,6 +62,32 @@ partial class SmoDbContextModelSnapshot : ModelSnapshot
                 .IsRequired();
         });
 
+        modelBuilder.Entity("SmoPmo.Smo.StrategicTheme", b =>
+        {
+            b.Property<Guid>("Id").ValueGeneratedOnAdd().HasColumnType("uuid");
+            b.Property<string>("Code").HasMaxLength(20).HasColumnType("character varying(20)");
+            b.Property<DateTimeOffset>("CreatedAt").HasColumnType("timestamp with time zone");
+            b.Property<string>("CreatedBy").IsRequired().HasColumnType("text");
+            b.Property<string>("Description").HasColumnType("text");
+            b.Property<string>("DescriptionAr").HasColumnType("text");
+            b.Property<int>("DisplayOrder").HasColumnType("integer");
+            b.Property<string>("Name").IsRequired().HasMaxLength(200).HasColumnType("character varying(200)");
+            b.Property<string>("NameAr").HasMaxLength(200).HasColumnType("character varying(200)");
+            b.Property<Guid>("StrategyId").HasColumnType("uuid");
+            b.Property<Guid>("TenantId").HasColumnType("uuid");
+            b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
+            b.Property<string>("UpdatedBy").HasColumnType("text");
+            b.HasKey("Id");
+            b.HasIndex("TenantId", "StrategyId");
+            b.HasIndex("StrategyId");
+            b.ToTable("SmoStrategicThemes");
+            b.HasOne("SmoPmo.Smo.Strategy", "Strategy")
+                .WithMany()
+                .HasForeignKey("StrategyId")
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
+        });
+
         modelBuilder.Entity("SmoPmo.Smo.Objective", b =>
         {
             b.Property<Guid>("Id").ValueGeneratedOnAdd().HasColumnType("uuid");
@@ -78,19 +104,26 @@ partial class SmoDbContextModelSnapshot : ModelSnapshot
             b.Property<Guid?>("OrgUnitId").HasColumnType("uuid");
             b.Property<Guid?>("OwnerUserId").HasColumnType("uuid");
             b.Property<Guid>("PerspectiveId").HasColumnType("uuid");
+            b.Property<Guid?>("StrategicThemeId").HasColumnType("uuid");
             b.Property<string>("TargetState").HasColumnType("text");
             b.Property<Guid>("TenantId").HasColumnType("uuid");
             b.Property<DateTimeOffset?>("UpdatedAt").HasColumnType("timestamp with time zone");
             b.Property<string>("UpdatedBy").HasColumnType("text");
             b.HasKey("Id");
             b.HasIndex("TenantId", "PerspectiveId");
+            b.HasIndex("TenantId", "StrategicThemeId");
             b.HasIndex("PerspectiveId");
+            b.HasIndex("StrategicThemeId");
             b.ToTable("SmoObjectives");
             b.HasOne("SmoPmo.Smo.Perspective", "Perspective")
                 .WithMany("Objectives")
                 .HasForeignKey("PerspectiveId")
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
+            b.HasOne("SmoPmo.Smo.StrategicTheme", "StrategicTheme")
+                .WithMany("Objectives")
+                .HasForeignKey("StrategicThemeId")
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity("SmoPmo.Smo.Kpi", b =>
