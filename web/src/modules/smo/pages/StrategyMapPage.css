@@ -1,0 +1,156 @@
+.strategy-map-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  flex: 1;
+}
+
+.strategy-map-page__hint {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 0;
+}
+
+.strategy-map-page__layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex: 1;
+  min-height: 640px;
+}
+
+.strategy-map-page__canvas-card {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+/* React Flow's root fills this with height:100% — CSS only resolves that against a
+   parent with a *definite* height, and min-height on an auto-sized ancestor chain
+   (the card above this is height:auto, sized to its content) doesn't count as definite,
+   so React Flow silently renders at 0 height. A fixed px height breaks the chain cleanly. */
+.strategy-map-page__canvas {
+  width: 100%;
+  height: 640px;
+}
+
+/* The canvas is forced dir="ltr" (StrategyMapPage.tsx) — React Flow lays nodes out by raw
+   x/y and isn't RTL-aware, so mirroring is done once, in the layout math, by negating each
+   node's x under RTL. Letting the browser's own bidi reordering act on top of that as well
+   would double-mirror it. */
+.strategy-map-page__canvas .react-flow__attribution {
+  display: none;
+}
+
+.strategy-map-page__node {
+  width: 200px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-inline-start-width: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.strategy-map-page__node--ok { border-inline-start-color: var(--ok); }
+.strategy-map-page__node--warn { border-inline-start-color: var(--warn); }
+.strategy-map-page__node--risk { border-inline-start-color: var(--risk); }
+.strategy-map-page__node--neutral { border-inline-start-color: var(--border-strong); }
+
+.strategy-map-page__node--selected {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 2px var(--brand-soft);
+}
+
+.strategy-map-page__node-name {
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.strategy-map-page__row-label {
+  width: 150px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--text-mute);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.strategy-map-page__drawer {
+  width: 320px;
+  flex: none;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.strategy-map-page__drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 20px;
+  border-block-end: 1px solid var(--border);
+}
+
+.strategy-map-page__drawer-header h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.strategy-map-page__drawer-target {
+  margin: 4px 0 0;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+
+.strategy-map-page__drawer-section {
+  margin: 18px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.strategy-map-page__drawer-empty {
+  color: var(--text-mute);
+  font-size: 13px;
+  margin: 0;
+}
+
+.strategy-map-page__drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.strategy-map-page__drawer-list li {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.strategy-map-page__drawer-item-name {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.strategy-map-page__drawer-item-meta {
+  color: var(--text-mute);
+  font-size: 12px;
+}

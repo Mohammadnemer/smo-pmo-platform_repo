@@ -1,0 +1,12 @@
+<Project>
+  <!-- Applies to every project under /src. Keeps the target framework and
+       language settings in one place (see architecture-mvp.md: .NET latest LTS = net10.0). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>SmoPmo.Api</RootNamespace>
+    <AssemblyName>SmoPmo.Api</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- /Api is the ONLY project allowed to reference every module. This is where
+         the monolith is composed (architecture-mvp.md §9). -->
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Platform\Platform.csproj" />
+    <ProjectReference Include="..\SMO\SMO.csproj" />
+    <ProjectReference Include="..\PMO\PMO.csproj" />
+    <ProjectReference Include="..\Workflow\Workflow.csproj" />
+    <ProjectReference Include="..\Rollup\Rollup.csproj" />
+    <ProjectReference Include="..\Notifications\Notifications.csproj" />
+    <ProjectReference Include="..\Worker\Worker.csproj" />
+  </ItemGroup>
+</Project>

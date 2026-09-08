@@ -1,0 +1,106 @@
+.scorecard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.scorecard-page__strategy-heading,
+.scorecard-page__perspective-heading,
+.scorecard-page__objective-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scorecard-page__strategy-heading h2 {
+  margin: 0;
+}
+
+.scorecard-page__strategy-copy {
+  color: var(--text-dim);
+  margin-block: 0 6px;
+}
+
+.scorecard-page__horizon {
+  color: var(--text-mute);
+  font-size: 13px;
+  margin-block: 0;
+}
+
+.scorecard-page__perspective {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.scorecard-page__perspective-heading h2 {
+  font-size: 16px;
+  margin: 0;
+}
+
+.scorecard-page__objective-heading h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.scorecard-page__target-state {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-block: 6px 0;
+}
+
+.scorecard-page__kpi-table-wrap {
+  overflow-x: auto;
+}
+
+.scorecard-page__kpi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.scorecard-page__kpi-table th,
+.scorecard-page__kpi-table td {
+  text-align: start;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-block-end: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.scorecard-page__kpi-table thead th {
+  color: var(--text-mute);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.scorecard-page__kpi-table tbody th {
+  font-weight: 500;
+  white-space: normal;
+}
+
+.scorecard-page__initiatives {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scorecard-page__initiatives li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.scorecard-page__initiative-name {
+  font-weight: 500;
+}
+
+.scorecard-page__initiative-meta {
+  color: var(--text-mute);
+}

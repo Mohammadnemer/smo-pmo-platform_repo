@@ -1,0 +1,302 @@
+.gantt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.gantt-legend {
+  display: flex;
+  gap: 16px;
+  padding-block: 10px 0;
+  padding-inline: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.gantt-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gantt-legend__swatch {
+  inline-size: 12px;
+  block-size: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.gantt-legend__swatch--normal {
+  background: var(--brand);
+}
+
+.gantt-legend__swatch--critical {
+  background: var(--risk);
+}
+
+.gantt-legend__swatch--today {
+  background: var(--warn);
+  inline-size: 2px;
+}
+
+.gantt-panes {
+  display: flex;
+  align-items: stretch;
+  border-block-start: 1px solid var(--border);
+  block-size: min(70vh, 560px);
+}
+
+.gantt-grid {
+  flex: none;
+  inline-size: 380px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-inline-end: 1px solid var(--border);
+  scrollbar-width: none;
+}
+
+.gantt-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.gantt-grid__header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  block-size: 40px;
+  align-items: center;
+  background: var(--surface-2);
+  border-block-end: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.gantt-grid__spacer {
+  position: relative;
+}
+
+.gantt-grid__row {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  block-size: 32px;
+  display: flex;
+  align-items: center;
+  border-block-end: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.gantt-grid__row--critical {
+  background: var(--risk-soft);
+}
+
+.gantt-col {
+  padding-inline: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gantt-col--wbs {
+  inline-size: 56px;
+  color: var(--text-mute);
+}
+
+.gantt-col--name {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.gantt-col--duration,
+.gantt-col--percent {
+  inline-size: 64px;
+  text-align: end;
+}
+
+.gantt-timeline {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.gantt-timeline__header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  block-size: 40px;
+  background: var(--surface-2);
+  border-block-end: 1px solid var(--border);
+}
+
+.gantt-tick {
+  position: absolute;
+  inset-block-start: 12px;
+  font-size: 11px;
+  color: var(--text-mute);
+  white-space: nowrap;
+  padding-inline-start: 4px;
+  border-inline-start: 1px solid var(--border);
+}
+
+.gantt-timeline__spacer {
+  position: relative;
+}
+
+.gantt-gridline {
+  position: absolute;
+  inset-block-start: 0;
+  inline-size: 1px;
+  background: var(--border);
+  opacity: 0.6;
+}
+
+.gantt-today-line {
+  position: absolute;
+  inset-block-start: 0;
+  inline-size: 2px;
+  background: var(--warn);
+  z-index: 1;
+}
+
+.gantt-arrows {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  pointer-events: none;
+}
+
+/* Path coordinates are computed LTR; logical-property mirroring (used everywhere else in this
+   component) doesn't reach SVG path data, so the whole overlay is flipped as one piece — same
+   technique Sparkline.css already uses for its polyline. */
+:root[dir='rtl'] .gantt-arrows {
+  transform: scaleX(-1);
+}
+
+.gantt-arrow-path {
+  fill: none;
+  stroke: var(--text-mute);
+  stroke-width: 1.5;
+}
+
+.gantt-bar {
+  position: absolute;
+  block-size: 24px;
+  border-radius: 4px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand);
+}
+
+/* No overflow:hidden on .gantt-bar (F8): the resize/link handles below are positioned
+   partly outside the bar's own box on purpose, for a comfortable hit target — a clipping
+   parent would clip their hit-testing along with their paint, so clicks meant for a handle
+   would silently fall through to the bar underneath instead. The fill gets its own
+   border-radius so it still reads as a rounded pill without needing the parent to clip it. */
+.gantt-bar__fill {
+  display: block;
+  block-size: 100%;
+  background: var(--brand);
+  opacity: 0.55;
+  border-radius: 3px;
+}
+
+.gantt-bar--critical {
+  background: var(--risk-soft);
+  border-color: var(--risk);
+}
+
+.gantt-bar--critical .gantt-bar__fill {
+  background: var(--risk);
+}
+
+.gantt-milestone {
+  position: absolute;
+  inline-size: 14px;
+  block-size: 14px;
+  background: var(--brand);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
+
+.gantt-milestone--critical {
+  background: var(--risk);
+}
+
+.gantt-bar--dragging {
+  z-index: 3;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
+  opacity: 0.9;
+}
+
+/* F8 interaction handles. Sized generously beyond their visual footprint (44px min touch
+   target isn't hit here — this is a desktop pointer-drag surface — but a few extra pixels of
+   hit area keeps the drag reliably grabbable at a glance). */
+.gantt-wbs-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 14px;
+  block-size: 14px;
+  margin-inline-end: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-mute);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gantt-resize-handle {
+  position: absolute;
+  inset-inline-end: -3px;
+  inset-block-start: 0;
+  inline-size: 8px;
+  block-size: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.gantt-link-handle {
+  position: absolute;
+  /* Clear of .gantt-resize-handle's -3px..+5px span (relative to the bar's own edge) so the
+   * two hit areas never overlap — they used to, and the later-painted (link) handle always
+   * won the hit-test at the bar's vertical center, silently swallowing every resize attempt. */
+  inset-inline-end: -16px;
+  inset-block-start: 50%;
+  inline-size: 9px;
+  block-size: 9px;
+  padding: 0;
+  border: 1px solid var(--surface);
+  border-radius: 50%;
+  background: var(--brand);
+  transform: translateY(-50%);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+/* Viewport-fixed so the preview line never needs scroll/RTL coordinate math — it's drawn in
+   raw pointer (client) coordinates from wherever the drag started to wherever the pointer is
+   now, purely cosmetic until drop, when the real hit-test (elementFromPoint) takes over. */
+.gantt-link-preview {
+  position: fixed;
+  inset: 0;
+  inline-size: 100vw;
+  block-size: 100vh;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.gantt-link-preview line {
+  stroke: var(--brand);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}

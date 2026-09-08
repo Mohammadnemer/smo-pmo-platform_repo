@@ -1,0 +1,45 @@
+.ui-sparkline {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+.ui-sparkline--empty {
+  display: inline-block;
+  inline-size: 96px;
+}
+
+/* Reading order (oldest → newest) stays start-to-end regardless of direction. */
+:root[dir='rtl'] .ui-sparkline {
+  transform: scaleX(-1);
+}
+
+.ui-sparkline polyline,
+.ui-sparkline circle {
+  stroke: var(--text-mute);
+  fill: var(--text-mute);
+}
+
+.ui-sparkline--ok polyline,
+.ui-sparkline--ok circle {
+  stroke: var(--ok);
+  fill: var(--ok);
+}
+
+.ui-sparkline--warn polyline,
+.ui-sparkline--warn circle {
+  stroke: var(--warn);
+  fill: var(--warn);
+}
+
+.ui-sparkline--risk polyline,
+.ui-sparkline--risk circle {
+  stroke: var(--risk);
+  fill: var(--risk);
+}
+
+.ui-sparkline--neutral polyline,
+.ui-sparkline--neutral circle {
+  stroke: var(--text-mute);
+  fill: var(--text-mute);
+}

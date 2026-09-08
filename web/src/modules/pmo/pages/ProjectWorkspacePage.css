@@ -1,0 +1,45 @@
+.project-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-workspace__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-mute);
+  font-size: 13px;
+}
+
+.project-workspace__breadcrumb a {
+  color: var(--text-mute);
+}
+
+.project-workspace__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.project-workspace__heading h1 {
+  margin: 0;
+}
+
+.project-workspace__description {
+  color: var(--text-dim);
+  margin: 0;
+}
+
+.project-workspace__finish {
+  color: var(--text-dim);
+  font-size: 13px;
+  margin-block: 0 10px;
+}
+
+.project-workspace__raid-form {
+  margin-block-start: 16px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--border);
+}

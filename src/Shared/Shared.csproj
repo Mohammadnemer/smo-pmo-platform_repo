@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SmoPmo.Shared</RootNamespace>
+    <AssemblyName>SmoPmo.Shared</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The mediator stays hand-rolled (architecture-mvp.md §12.2 flags MediatR's move
+         to a commercial licence). EF Core is here only so the two persistence
+         non-negotiables — the app.tenant_id session variable behind RLS, and the audit
+         SaveChanges interceptor — are written once and reused by every module instead of
+         being re-implemented (and mis-implemented) per module. No provider: modules pick
+         their own. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+  </ItemGroup>
+</Project>

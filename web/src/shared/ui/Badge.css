@@ -1,0 +1,37 @@
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding-block: 3px;
+  padding-inline: 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.ui-badge--ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.ui-badge--warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.ui-badge--risk {
+  background: var(--risk-soft);
+  color: var(--risk);
+}
+
+.ui-badge--neutral {
+  background: var(--surface-2);
+  color: var(--text-dim);
+}
+
+.ui-badge--brand {
+  background: var(--brand-soft);
+  color: var(--brand);
+}

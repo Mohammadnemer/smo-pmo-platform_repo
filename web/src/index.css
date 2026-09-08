@@ -1,0 +1,83 @@
+:root {
+  color-scheme: light;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+
+  /* Default-tenant light-theme tokens matching the design prototype. --brand/
+     --brand-soft/--brand-fg are overridden per tenant at runtime by
+     shared/branding (inline styles on this element win over these
+     defaults) — the values here are also what an unrecognized/unbranded
+     tenant falls back to. */
+  --brand: #2a6b8f;
+  --brand-soft: #e8f0f5;
+  --brand-fg: #ffffff;
+  --canvas: #e9eaee;
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f0f1f4;
+  --border: #e2e4ea;
+  --border-strong: #d3d7df;
+  --text: #171a1f;
+  --text-dim: #5b6270;
+  --text-mute: #8b91a0;
+  --hover-bg: #f2f3f6;
+  --ok: #3f7d5a;
+  --ok-soft: #e3f0e8;
+  --warn: #9a7423;
+  --warn-soft: #f7f0e0;
+  --risk: #a4503f;
+  --risk-soft: #f5e6e2;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #14161a;
+  --bg: #191c21;
+  --surface: #1f2229;
+  --surface-2: #262a32;
+  --border: #33373f;
+  --border-strong: #40454e;
+  --text: #eceef2;
+  --text-dim: #b7bcc6;
+  --text-mute: #838a97;
+  --hover-bg: #2a2e36;
+  --ok: #6cbf92;
+  --ok-soft: #1e2e26;
+  --warn: #d8ab5c;
+  --warn-soft: #332b1a;
+  --risk: #e0897a;
+  --risk-soft: #3a2622;
+}
+
+/* Tenant brand colours stay legible against a dark surface — the light pair
+   (e.g. navy-on-white) would lose contrast if carried over unchanged. */
+:root[data-theme='dark'] {
+  --brand-soft: color-mix(in srgb, var(--brand) 22%, var(--surface));
+}
+
+:root[lang='ar'] {
+  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--text);
+}
+
+/* Logical properties only, per CLAUDE.md's i18n non-negotiable — direction
+   flips (F2) must not require touching this file. */
+
+.auth-status {
+  padding-block: 2rem;
+  padding-inline: 1.5rem;
+  text-align: center;
+}
+
+.auth-status--error {
+  color: var(--risk);
+}

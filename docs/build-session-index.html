@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Manifest · SMO + PMO Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1216;--panel:#171B21;--panel-2:#1E242C;
+    --line:#2A313B;--line-soft:#212832;
+    --ink:#E7EBF0;--dim:#98A2AE;--faint:#616B77;
+    --brass:#D8A657;--brass-soft:#E9C486;--brass-dim:rgba(216,166,87,.14);
+    --lock:#586273;
+    --disp:'Archivo',sans-serif;--body:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:0 22px}
+  .mono{font-family:var(--mono)}
+
+  header{padding:60px 0 26px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(1.9rem,5vw,2.9rem);letter-spacing:-.025em;margin:13px 0 14px;line-height:1.03}
+  .sub{color:var(--dim);max-width:60ch;font-size:1rem}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .progress-wrap{margin-top:28px;display:flex;align-items:center;gap:15px}
+  .bar{flex:1;height:9px;background:var(--panel-2);border-radius:20px;overflow:hidden;border:1px solid var(--line-soft)}
+  .bar-fill{height:100%;width:0;background:linear-gradient(90deg,#B4813A,var(--brass));border-radius:20px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .pct{font-family:var(--mono);font-size:.8rem;color:var(--brass-soft);min-width:120px;text-align:right}
+
+  .legend{margin-top:16px;display:flex;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--faint)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:10px;height:10px;border-radius:3px;border:1.5px solid var(--brass)}
+  .dot.on{background:var(--brass)}
+  .dot.lk{border-color:var(--lock);border-radius:3px}
+
+  .how{margin:26px 0 0;padding:16px 20px;border-left:3px solid var(--brass);background:var(--brass-dim);border-radius:0 5px 5px 0}
+  .how p{font-size:.9rem;color:var(--dim)}
+  .how b{color:var(--brass-soft)}
+  .how code{font-family:var(--mono);font-size:.82rem;color:var(--ink);background:var(--panel-2);padding:1px 7px;border-radius:5px}
+
+  .track{padding:32px 0 6px;border-bottom:1px solid var(--line);border-left:3px solid var(--tc,var(--line));padding-left:18px;margin-left:-21px}
+  .track:last-of-type{border-bottom:none}
+  .track-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .track-tag{font-family:var(--mono);font-weight:500;font-size:.72rem;color:var(--tc,var(--brass));border:1px solid var(--tc,var(--line));border-radius:20px;padding:3px 11px;opacity:.95}
+  .track-head h2{font-family:var(--disp);font-weight:600;font-size:1.22rem;letter-spacing:-.01em}
+  .track-meta{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .mini{width:90px;height:6px;background:var(--panel-2);border-radius:20px;overflow:hidden;border:1px solid var(--line-soft)}
+  .mini-fill{height:100%;width:0;background:var(--tc,var(--brass));border-radius:20px;transition:width .4s ease}
+  .count{font-family:var(--mono);font-size:.7rem;color:var(--faint);white-space:nowrap}
+
+  .sessions{display:grid;gap:9px}
+  .s{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+    border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:13px 16px;transition:border-color .2s,background .2s}
+  .s:hover{border-color:var(--tc,var(--brass))}
+  .s.done{opacity:.5}
+  .s.done .s-title{text-decoration:line-through;text-decoration-color:var(--faint)}
+  .s.locked{background:transparent;border-style:dashed;border-color:var(--line-soft);opacity:.72}
+  .s.locked:hover{border-color:var(--line)}
+
+  .cb{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:1.5px solid var(--faint);
+    border-radius:6px;background:transparent;cursor:pointer;margin-top:2px;flex:none;position:relative;transition:.15s}
+  .cb:hover{border-color:var(--brass)}
+  .cb:checked{background:var(--brass);border-color:var(--brass)}
+  .cb:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--bg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .cb:focus-visible{outline:2px solid var(--brass-soft);outline-offset:2px}
+  .lock{width:20px;height:20px;margin-top:2px;flex:none;display:flex;align-items:center;justify-content:center;color:var(--lock)}
+  .lock svg{width:13px;height:13px}
+
+  .s-body{min-width:0}
+  .s-title{font-family:var(--disp);font-weight:600;font-size:.98rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .s-id{font-family:var(--mono);font-size:.72rem;color:var(--tc,var(--brass));font-weight:500}
+  .locked .s-id{color:var(--lock)}
+  .phase{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:var(--lock);border:1px solid var(--line);border-radius:4px;padding:1px 6px;text-transform:uppercase}
+  .s-scope{font-size:.87rem;color:var(--dim);margin-top:4px}
+  .s-check{font-size:.82rem;color:var(--faint);margin-top:7px}
+  .s-check b{color:var(--brass);font-weight:500}
+  .locked .s-check b{color:var(--lock)}
+
+  footer{padding:36px 0 64px;color:var(--faint);font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-align:center;line-height:1.8}
+  @media (max-width:560px){.track-meta{margin-left:0;width:100%}.mini{flex:1;width:auto}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Build manifest · SMO + PMO platform</div>
+    <h1>Strategy-to-execution, one session at a time</h1>
+    <p class="sub">Each row is <b>one build session</b> — a single chat you start. Work a track roughly top-down; dependencies run left-to-right across tracks (Foundation → DB → Backend → Frontend). Tick a row only when its <b>Done when</b> line is true — when it runs, not when we've discussed it.</p>
+
+    <div class="progress-wrap">
+      <div class="bar"><div class="bar-fill" id="fill"></div></div>
+      <div class="pct" id="pct">0 / 0 MVP done</div>
+    </div>
+
+    <div class="legend">
+      <span><span class="dot"></span> MVP · checkable now</span>
+      <span><span class="dot on"></span> done</span>
+      <span><span class="dot lk"></span> later phase · locked</span>
+    </div>
+
+    <div class="how">
+      <p><b>How to use it:</b> start a new chat named after a session (e.g. <code>B2 · Auth with Entra External ID</code>), say <b>"let's build B2"</b>, and we build it together against its acceptance line. Locked rows (P2/P3) unlock once the MVP is standing.</p>
+    </div>
+  </header>
+
+  <div id="tracks"></div>
+
+  <footer>PROGRESS SAVES IN THIS PAGE · TICK WHAT RUNS, NOT WHAT WE TALKED ABOUT<br>MVP FIRST · SPLIT SERVICES ONLY WHEN THE MONOLITH HURTS</footer>
+</div>
+
+<script>
+const DATA=[
+ {tag:"Track T",title:"Foundation & infra",color:"#7FA8D0",
+  sessions:[
+   {id:"T1",p:"mvp",t:"Repo & solution skeleton",s:"Mono-repo with /src modules, /web and /infra; empty .NET projects wired to /Shared and /Api.",c:"dotnet build passes and no module project-references another module directly."},
+   {id:"T2",p:"mvp",t:"Azure resources (Bicep)",s:"Resource group, Container App environment, Postgres, Blob, Key Vault and App Insights in your GCC region.",c:"one Bicep deploy provisions everything and you can connect to the database."},
+   {id:"T3",p:"mvp",t:"CI/CD pipeline",s:"GitHub Actions builds and tests, containerises the API to Container Apps, ships the SPA to Static Web Apps.",c:"a push to main deploys the API and SPA with no manual steps."},
+   {id:"T4",p:"p2",t:"Redis & Service Bus",s:"Add managed cache and the event bus; move roll-up events off in-process.",c:"roll-up events flow through Service Bus instead of the in-process mediator."},
+   {id:"T5",p:"p3",t:"Front Door, WAF & replica",s:"Edge routing, WAF rules and a Postgres read replica for dashboards.",c:"traffic is fronted by the WAF and dashboards read from the replica."},
+  ]},
+ {tag:"Track D",title:"Database",color:"#B693D6",
+  sessions:[
+   {id:"D1",p:"mvp",t:"Core schema & EF Core",s:"DbContext, a base entity with tenant_id and audit fields, and the first migration for tenants, org units, users and roles.",c:"the migration applies and every table carries tenant_id."},
+   {id:"D2",p:"mvp",t:"Row-Level Security",s:"An RLS policy on every tenant table, keyed to the app.tenant_id session variable.",c:"a query run without the tenant variable set returns zero rows."},
+   {id:"D3",p:"mvp",t:"SMO & PMO schema",s:"Objectives, KPIs, initiatives; portfolios, programs, projects, tasks, dependencies and RAID.",c:"a project with tasks and FS/SS/FF/SF dependencies round-trips through the DB."},
+   {id:"D4",p:"mvp",t:"Lookups & tenant seed",s:"Reference lists, plus a seed that gives a new tenant BSC perspectives, RAID categories, statuses and a Fri–Sat calendar.",c:"creating a tenant seeds sensible defaults automatically."},
+   {id:"D5",p:"p3",t:"Partitioning & archival",s:"Partition large task tables and archive closed projects to keep the hot set small.",c:"a 10k-task tenant queries at the same speed as a small one."},
+  ]},
+ {tag:"Track B",title:"Backend",color:"#E08A6E",
+  sessions:[
+   {id:"B1",p:"mvp",t:"Request pipeline & tenancy",s:"Middleware that validates the token, resolves the tenant and sets the DB session variable into a scoped TenantContext.",c:"tenant_id flows from the JWT all the way to the Postgres connection."},
+   {id:"B2",p:"mvp",t:"Auth with Entra External ID",s:"OIDC and JWT bearer configured; the SPA login round-trips a token the API trusts.",c:"a signed-in SPA user calls a protected endpoint successfully."},
+   {id:"B3",p:"mvp",t:"RBAC",s:"Policy-based authorisation over the entity × action matrix, scoped to org unit.",c:"a Contributor is refused an admin action while a PM is allowed their own."},
+   {id:"B4",p:"mvp",t:"Mediator, events & audit",s:"In-process command/event bus in /Shared, module wiring, and a SaveChanges interceptor for the audit log.",c:"a command runs through a handler and the change lands in the audit log."},
+   {id:"B5",p:"mvp",t:"SMO API",s:"CRUD for strategy, perspectives, objectives, KPIs and initiatives.",c:"the scorecard's data can be built end to end through the API."},
+   {id:"B6",p:"mvp",t:"PMO API & scheduler",s:"CRUD for portfolios/programs/projects, tasks and dependencies, RAID and status reports; the CPM engine wired server-side.",c:"saving a schedule and asking for its critical path returns the right tasks."},
+   {id:"B7",p:"mvp",t:"Fixed approval flow",s:"Hard-coded Draft → Submitted → Under review → Approved → Active for projects and initiatives.",c:"a project walks the fixed states with the correct role gate at each step."},
+   {id:"B8",p:"mvp",t:"Notifications",s:"Event-driven in-app and email, templated and localised.",c:"an approval-pending transition emails the approver and shows in-app."},
+   {id:"B9",p:"p2",t:"Configurable workflow engine",s:"Data-driven state machine with a visual builder and multi-step approvals.",c:"an admin defines a new approval flow without a code change."},
+   {id:"B10",p:"p2",t:"Budget & cost",s:"Planned vs actual at task/project/program/portfolio; EVM optional.",c:"a project shows planned-vs-actual cost with variance."},
+   {id:"B11",p:"p2",t:"Resource management",s:"Resource pool, allocation %, capacity vs demand and over-allocation warnings.",c:"assigning past capacity raises an over-allocation warning."},
+  ]},
+ {tag:"Track F",title:"Frontend",color:"#6FC3B3",
+  sessions:[
+   {id:"F1",p:"mvp",t:"SPA scaffold",s:"Vite + React + TS, routing, TanStack Query and MSAL auth, with folders mirroring the backend modules.",c:"the app boots and login redirects to Entra and returns authenticated."},
+   {id:"F2",p:"mvp",t:"i18n & RTL shell",s:"react-i18next with an AR/EN switch, logical CSS, and a fully mirroring layout and nav.",c:"switching to Arabic flips the whole shell correctly, with no hard-coded left/right."},
+   {id:"F3",p:"mvp",t:"Design system & branding",s:"A component library, light/dark, and a per-tenant logo and colour hook.",c:"a tenant's branding applies without a code change."},
+   {id:"F4",p:"mvp",t:"Scorecard & KPIs",s:"A scorecard table with RAG, objective and KPI detail, and trend charts.",c:"a RAG scorecard renders live from the SMO API."},
+   {id:"F5",p:"mvp",t:"Strategy map",s:"A React Flow canvas: objectives by perspective, cause-effect edges, RAG colour and drill-down.",c:"clicking an objective drills into its KPIs and initiatives."},
+   {id:"F6",p:"mvp",t:"PMO project screens",s:"Portfolio/program/project lists, a project workspace shell and RAID panels.",c:"a project workspace opens with its schedule and RAID."},
+   {id:"F7",p:"mvp",t:"Gantt rendering",s:"Virtualised grid + SVG timeline, bars, dependency arrows, critical-path highlight, today line, RTL.",c:"a 10k-task project scrolls and renders smoothly."},
+   {id:"F8",p:"mvp",t:"Gantt interaction",s:"Drag to move, resize duration, draw dependencies, expand/collapse and live reschedule.",c:"dragging a task reschedules its dependents in place."},
+   {id:"F9",p:"mvp",t:"Executive dashboard v1",s:"Cross-module widgets and a PDF export.",c:"one screen answers 'is our work moving our strategy?'."},
+   {id:"F10",p:"p2",t:"Gantt baselines",s:"Save baselines and overlay planned-vs-actual variance.",c:"a saved baseline shows slippage against the live schedule."},
+   {id:"F11",p:"p3",t:"Board-pack export",s:"Export dashboards to PowerPoint for board packs.",c:"a dashboard exports to a formatted PPT deck."},
+  ]},
+ {tag:"Track X",title:"Integration & roll-up",color:"#A9C06B",
+  sessions:[
+   {id:"X1",p:"mvp",t:"Initiative ↔ delivery links",s:"M:N links from initiatives to programs/projects with a primary flag and contribution weight.",c:"an initiative lists the programs and projects delivering it."},
+   {id:"X2",p:"mvp",t:"Roll-up worker",s:"In-process BackgroundService: PMO events → debounce → compute and store health up project → initiative → objective → strategy.",c:"moving a task's % complete changes its objective's stored health."},
+   {id:"X3",p:"mvp",t:"Traceability & alignment",s:"Drill any objective to its projects and back; 'unaligned work' and 'unfunded objectives' reports.",c:"both reports return the right rows for a seeded tenant."},
+   {id:"X4",p:"p2",t:"Service Bus roll-up",s:"Move events onto Service Bus and split the worker so it scales independently.",c:"roll-up keeps up under a burst of task edits without blocking writes."},
+  ]},
+ {tag:"Track P",title:"Platform & admin",color:"#DB8AA6",
+  sessions:[
+   {id:"P1",p:"mvp",t:"Tenant & user admin",s:"Create a tenant, invite users and assign roles and org units.",c:"a new tenant admin can onboard a user end to end."},
+   {id:"P2",p:"mvp",t:"Lookups admin",s:"Manage reference lists per tenant.",c:"renaming a status updates everywhere it is shown."},
+   {id:"P3",p:"mvp",t:"Localisation & calendars",s:"Language default, translatable strings and weekend/holiday calendar config.",c:"a tenant sets a Fri–Sat weekend and the schedule respects it."},
+   {id:"P4",p:"mvp",t:"Themes & branding admin",s:"Per-tenant logo, palette and favicon.",c:"branding changes apply without a deploy."},
+   {id:"P5",p:"mvp",t:"Audit log viewer",s:"A searchable who-changed-what-when across entities and admin config.",c:"an admin can trace a specific change to a user and a time."},
+   {id:"P6",p:"p3",t:"SSO/SAML & 2FA policies",s:"Per-tenant SAML/OIDC federation and 2FA enforcement.",c:"a tenant signs in through its own IdP with 2FA required."},
+   {id:"P7",p:"p2",t:"Custom roles builder",s:"Let tenant admins define custom roles over the permission matrix.",c:"a custom role restricts a user exactly as configured."},
+  ]},
+];
+
+const PHASE_LABEL={p2:"Phase 2",p3:"Phase 3"};
+const KEY='build-session-index-v1';
+let state={};
+const tracks=document.getElementById('tracks');
+const fill=document.getElementById('fill');
+const pct=document.getElementById('pct');
+const LOCK_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+
+function mvpCount(tr){return tr.sessions.filter(s=>s.p==='mvp').length;}
+function esc(x){return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function render(){
+  tracks.innerHTML='';
+  DATA.forEach(function(tr){
+    const sec=document.createElement('section');
+    sec.className='track';
+    sec.style.setProperty('--tc',tr.color);
+    const mvpN=mvpCount(tr);
+    const lockedN=tr.sessions.length-mvpN;
+    let head='<div class="track-head"><span class="track-tag">'+esc(tr.tag)+'</span><h2>'+esc(tr.title)+'</h2>'+
+      '<div class="track-meta"><div class="mini"><div class="mini-fill" data-track="'+esc(tr.tag)+'"></div></div>'+
+      '<span class="count" data-track="'+esc(tr.tag)+'">0 / '+mvpN+(lockedN?' · +'+lockedN+' later':'')+'</span></div></div>';
+    let body='<div class="sessions">';
+    tr.sessions.forEach(function(s){
+      if(s.p==='mvp'){
+        const done=!!state[s.id];
+        body+='<label class="s'+(done?' done':'')+'" data-id="'+s.id+'">'+
+          '<input type="checkbox" class="cb" '+(done?'checked':'')+' data-id="'+s.id+'" aria-label="Mark '+esc(s.id)+' '+esc(s.t)+' done">'+
+          '<span class="s-body"><span class="s-title"><span class="s-id">'+esc(s.id)+'</span>'+esc(s.t)+'</span>'+
+          '<span class="s-scope">'+esc(s.s)+'</span>'+
+          '<span class="s-check"><b>Done when:</b> '+esc(s.c)+'</span></span></label>';
+      }else{
+        body+='<div class="s locked" data-id="'+esc(s.id)+'">'+
+          '<span class="lock" aria-hidden="true">'+LOCK_SVG+'</span>'+
+          '<span class="s-body"><span class="s-title"><span class="s-id">'+esc(s.id)+'</span>'+esc(s.t)+
+          ' <span class="phase">'+PHASE_LABEL[s.p]+'</span></span>'+
+          '<span class="s-scope">'+esc(s.s)+'</span>'+
+          '<span class="s-check"><b>Done when:</b> '+esc(s.c)+'</span></span></div>';
+      }
+    });
+    body+='</div>';
+    sec.innerHTML=head+body;
+    tracks.appendChild(sec);
+  });
+  tracks.querySelectorAll('.cb').forEach(function(cb){
+    cb.addEventListener('change',function(){
+      state[cb.dataset.id]=cb.checked;
+      save();
+      cb.closest('.s').classList.toggle('done',cb.checked);
+      updateBars();
+    });
+  });
+  updateBars();
+}
+
+function updateBars(){
+  let total=0,done=0;
+  DATA.forEach(function(tr){
+    const mvp=tr.sessions.filter(s=>s.p==='mvp');
+    const d=mvp.filter(s=>state[s.id]).length;
+    total+=mvp.length;done+=d;
+    const lockedN=tr.sessions.length-mvp.length;
+    const mf=tracks.querySelector('.mini-fill[data-track="'+CSS.escape(tr.tag)+'"]');
+    const ct=tracks.querySelector('.count[data-track="'+CSS.escape(tr.tag)+'"]');
+    if(mf)mf.style.width=(mvp.length?Math.round(d/mvp.length*100):0)+'%';
+    if(ct)ct.textContent=d+' / '+mvp.length+(lockedN?' · +'+lockedN+' later':'');
+  });
+  const p=total?Math.round(done/total*100):0;
+  fill.style.width=p+'%';
+  pct.textContent=done+' / '+total+' MVP done';
+}
+
+async function save(){
+  try{if(window.storage){await window.storage.set(KEY,JSON.stringify(state),false);}else{localStorage.setItem(KEY,JSON.stringify(state));}}catch(e){}
+}
+async function load(){
+  try{
+    if(window.storage){const r=await window.storage.get(KEY,false);if(r&&r.value)state=JSON.parse(r.value)||{};}
+    else{const v=localStorage.getItem(KEY);if(v)state=JSON.parse(v)||{};}
+  }catch(e){state={};}
+  render();
+}
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+/* Shared by the PMO list pages (Portfolios/Programs/Projects) and reused by the project
+   workspace's schedule/RAID tables — logical properties only per CLAUDE.md's i18n
+   non-negotiable, mirroring ScorecardPage.css's conventions. */
+
+.pmo-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pmo-filter-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 13px;
+  margin: 0;
+}
+
+.pmo-filter-clear {
+  background: none;
+  border: none;
+  color: var(--brand);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.pmo-table-wrap {
+  overflow-x: auto;
+}
+
+.pmo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pmo-table th,
+.pmo-table td {
+  text-align: start;
+  padding-block: 8px;
+  padding-inline: 10px;
+  border-block-end: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.pmo-table thead th {
+  color: var(--text-mute);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.pmo-table tbody th {
+  font-weight: 500;
+}
+
+.pmo-table a {
+  color: var(--brand);
+}
+
+.pmo-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.pmo-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.pmo-form input,
+.pmo-form select {
+  font: inherit;
+  padding: 7px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.pmo-form button {
+  height: fit-content;
+}

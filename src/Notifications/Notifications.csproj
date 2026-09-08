@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>SmoPmo.Notifications</RootNamespace>
+    <AssemblyName>SmoPmo.Notifications</AssemblyName>
+    <!-- Marks this as a bounded module: Directory.Build.targets forbids it from
+         project-referencing anything but /Shared. -->
+    <IsModule>true</IsModule>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
+  </ItemGroup>
+</Project>

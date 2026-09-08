@@ -1,0 +1,248 @@
+{
+  "app": { "name": "SMO + PMO Platform" },
+  "nav": {
+    "home": "Home",
+    "strategyOverview": "Strategy",
+    "scorecard": "Scorecard",
+    "strategyMap": "Strategy map",
+    "initiatives": "Initiatives",
+    "projectsOverview": "Projects",
+    "portfolios": "Portfolios",
+    "programs": "Programs",
+    "executiveDashboard": "Dashboard",
+    "workflow": "Workflow",
+    "rollup": "Roll-up",
+    "notifications": "Notifications"
+  },
+  "topbar": {
+    "searchPlaceholder": "Search projects, risks, objectives",
+    "notifications": "Notifications",
+    "workspace": "Workspace",
+    "language": "Language",
+    "darkTheme": "Switch to dark theme",
+    "lightTheme": "Switch to light theme",
+    "signOut": "Sign out",
+    "signedIn": "Signed in",
+    "role": "Signed in user"
+  },
+  "workspace": {
+    "smo": "Strategy (SMO)",
+    "pmo": "Projects (PMO)",
+    "executive": "Executive"
+  },
+  "shell": {
+    "collapseNav": "Collapse navigation",
+    "expandNav": "Expand navigation"
+  },
+  "pages": {
+    "home": {
+      "title": "Signed in",
+      "welcome": "Welcome, {{name}}.",
+      "apiLabel": "API status:",
+      "apiChecking": "checking…",
+      "apiUnreachable": "unreachable",
+      "apiStatus": "{{status}} ({{service}})"
+    },
+    "strategy": {
+      "title": "Strategy (SMO)",
+      "body": "Strategy overview. See Scorecard, Strategy map and Initiatives in the side nav."
+    },
+    "scorecard": {
+      "title": "Scorecard",
+      "loading": "Loading scorecard…",
+      "error": "Could not load the scorecard from the SMO API.",
+      "empty": "No strategy has been created for this tenant yet.",
+      "horizon": "Horizon: {{start}} – {{end}}",
+      "trendFor": "Trend for {{name}}",
+      "rag": {
+        "green": "Green",
+        "amber": "Amber",
+        "red": "Red",
+        "notSet": "Not set"
+      },
+      "columns": {
+        "kpi": "KPI",
+        "baseline": "Baseline",
+        "target": "Target",
+        "actual": "Actual",
+        "achievement": "Achievement",
+        "rag": "RAG",
+        "trend": "Trend"
+      }
+    },
+    "strategyMap": {
+      "title": "Strategy map",
+      "hint": "Objectives are grouped by perspective (Financial at top) with arrows showing cause-effect. Click an objective to see its KPIs and initiatives.",
+      "loading": "Loading the strategy map…",
+      "error": "Could not load the strategy map from the SMO API.",
+      "empty": "No strategy has been created for this tenant yet.",
+      "drawer": {
+        "close": "Close",
+        "kpis": "KPIs",
+        "noKpis": "No KPIs on this objective yet.",
+        "initiatives": "Initiatives",
+        "noInitiatives": "No initiatives on this objective yet."
+      }
+    },
+    "initiatives": {
+      "title": "Initiatives",
+      "body": "A dedicated initiative list is out of scope for now — browse initiatives via the Scorecard or Strategy map drill-down."
+    },
+    "projects": {
+      "title": "Projects",
+      "loading": "Loading projects…",
+      "error": "Could not load projects from the PMO API.",
+      "empty": "No projects yet — add one below.",
+      "filteredBy": "Showing projects in program: {{name}}",
+      "clearFilter": "Clear filter",
+      "columns": {
+        "name": "Project",
+        "program": "Program",
+        "status": "Status",
+        "startDate": "Start date"
+      },
+      "form": {
+        "title": "New project",
+        "program": "Program",
+        "selectProgram": "Select a program…",
+        "name": "Name",
+        "startDate": "Start date",
+        "status": "Status",
+        "description": "Description",
+        "create": "Create project",
+        "creating": "Creating…",
+        "error": "Could not create the project."
+      }
+    },
+    "portfolios": {
+      "title": "Portfolios",
+      "loading": "Loading portfolios…",
+      "error": "Could not load portfolios from the PMO API.",
+      "empty": "No portfolios yet — add one below.",
+      "columns": {
+        "name": "Portfolio",
+        "description": "Description",
+        "programs": "Programs"
+      },
+      "form": {
+        "title": "New portfolio",
+        "name": "Name",
+        "description": "Description",
+        "create": "Create portfolio",
+        "creating": "Creating…",
+        "error": "Could not create the portfolio."
+      }
+    },
+    "programs": {
+      "title": "Programs",
+      "loading": "Loading programs…",
+      "error": "Could not load programs from the PMO API.",
+      "empty": "No programs yet — add one below.",
+      "filteredBy": "Showing programs in portfolio: {{name}}",
+      "clearFilter": "Clear filter",
+      "columns": {
+        "name": "Program",
+        "portfolio": "Portfolio",
+        "description": "Description",
+        "projects": "Projects"
+      },
+      "form": {
+        "title": "New program",
+        "portfolio": "Portfolio",
+        "selectPortfolio": "Select a portfolio…",
+        "name": "Name",
+        "description": "Description",
+        "create": "Create program",
+        "creating": "Creating…",
+        "error": "Could not create the program."
+      }
+    },
+    "projectWorkspace": {
+      "loading": "Loading project…",
+      "notFound": "Could not load this project from the PMO API.",
+      "breadcrumbLabel": "Project location",
+      "schedule": {
+        "title": "Schedule",
+        "loading": "Loading schedule…",
+        "error": "Could not load the schedule from the PMO API.",
+        "empty": "No tasks yet — the Gantt appears here once the project has tasks.",
+        "finish": "Project finish: {{date}}",
+        "milestone": "milestone",
+        "criticalLabel": "Critical",
+        "columns": {
+          "wbs": "WBS",
+          "name": "Task",
+          "duration": "Duration (days)",
+          "percent": "% complete",
+          "start": "Start",
+          "finish": "Finish",
+          "float": "Float (days)",
+          "critical": "Critical path"
+        },
+        "gantt": {
+          "ariaLabel": "Project Gantt chart",
+          "legendNormal": "On schedule",
+          "legendCritical": "Critical path",
+          "legendToday": "Today",
+          "stressLabel": "stress test: {{count}} tasks",
+          "expand": "Expand {{name}}",
+          "collapse": "Collapse {{name}}",
+          "resize": "Resize {{name}}",
+          "linkFrom": "Draw a dependency from {{name}}",
+          "error": "Could not save that change to the schedule."
+        }
+      },
+      "raid": {
+        "title": "RAID",
+        "loading": "Loading RAID items…",
+        "error": "Could not load RAID items from the PMO API.",
+        "empty": "No RAID items yet — add one below.",
+        "columns": {
+          "title": "Title",
+          "category": "Category",
+          "severity": "Severity",
+          "status": "Status",
+          "due": "Due date"
+        },
+        "categories": {
+          "risk": "Risk",
+          "action": "Action",
+          "issue": "Issue",
+          "decision": "Decision"
+        },
+        "severities": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        },
+        "form": {
+          "title": "Title",
+          "category": "Category",
+          "severity": "Severity",
+          "dueDate": "Due date",
+          "description": "Description",
+          "create": "Add RAID item",
+          "creating": "Adding…",
+          "error": "Could not create the RAID item."
+        }
+      }
+    },
+    "executive": {
+      "title": "Executive dashboard",
+      "body": "Cross-module widgets and PDF export land in session F9."
+    },
+    "workflow": {
+      "title": "Workflow",
+      "body": "Approval-flow surfaces land alongside their host module screens."
+    },
+    "rollup": {
+      "title": "Roll-up",
+      "body": "Traceability and alignment reports land in session X3."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "body": "In-app notification center lands alongside session B8."
+    }
+  }
+}

@@ -1,0 +1,20 @@
+<Project>
+  <!--
+    Non-negotiable module seam (architecture-mvp.md §9 & §10):
+    a *module* (IsModule=true) may project-reference ONLY /Shared. It must never
+    reference another module, /Api or /Worker. Cross-module communication goes
+    through the in-process mediator (IMessageBus) in /Shared.
+
+    This runs during a normal `dotnet build`, so the T1 acceptance line
+    ("no module project-references another module directly") is enforced by the
+    build itself, not by convention. Add an illegal reference and the build fails.
+  -->
+  <Target Name="EnforceModuleBoundaries" BeforeTargets="Build" Condition="'$(IsModule)' == 'true'">
+    <ItemGroup>
+      <_ModuleProjectRef Include="@(ProjectReference)" />
+    </ItemGroup>
+    <Error
+        Condition="'%(_ModuleProjectRef.Filename)' != 'Shared'"
+        Text="MODULE BOUNDARY VIOLATION in '$(MSBuildProjectName)': a module may only project-reference 'Shared', but it references '%(_ModuleProjectRef.Filename)'. Route cross-module calls through the in-process mediator (IMessageBus) in /Shared — see architecture-mvp.md §9." />
+  </Target>
+</Project>
