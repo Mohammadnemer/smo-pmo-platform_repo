@@ -1,0 +1,102 @@
+# =============================================================================
+#  Build the .NET API and deploy it to Azure App Service (Free F1).
+#
+#  Setup required once, before this will run:
+#    1. App Service -> Overview -> "Get publish profile" (downloads an XML file)
+#    2. GitHub repo -> Settings -> Secrets and variables -> Actions -> New secret
+#         Name:  AZURE_WEBAPP_PUBLISH_PROFILE
+#         Value: the entire contents of that XML file
+#    3. Set AZURE_WEBAPP_NAME below to your App Service name.
+#
+#  The SPA is NOT deployed here — Azure Static Web Apps generates its own
+#  workflow file when you connect the repo in the portal. Leave that one alone.
+# =============================================================================
+
+name: Deploy API
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - '.github/workflows/deploy-api.yml'
+  workflow_dispatch:        # lets you trigger a deploy manually from the UI
+
+env:
+  AZURE_WEBAPP_NAME: smopmo-api        # <-- change to your App Service name
+  API_PROJECT: src/Api/Api.csproj
+  DOTNET_VERSION: '10.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install the .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Restores NuGet packages for the whole solution. Cached between runs by
+      # setup-dotnet, so this is fast after the first build.
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # If these fail, nothing deploys. That is the point of putting them here:
+      # the CPM scheduling engine and the roll-up worker are the two places where
+      # a silent regression is expensive.
+      - name: Run tests
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      # "Publish" produces a self-contained folder of everything the app needs
+      # to run: the compiled DLLs, config files and static assets. This is what
+      # gets uploaded — not your source code.
+      - name: Publish
+        run: dotnet publish ${{ env.API_PROJECT }} --configuration Release --no-build --output ./publish
+
+      # Zips the publish folder, uploads it, and restarts the app. Azure swaps
+      # the files in place; expect roughly 30-60 seconds of downtime on the Free
+      # tier, which has no deployment slots.
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./publish
+
+      # The Free tier unloads the app when idle, so the first request after a
+      # deploy is slow. This wakes it and confirms the deploy is actually live
+      # rather than merely uploaded.
+      - name: Smoke test /health
+        run: |
+          echo "Waiting for the app to start..."
+          sleep 30
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" \
+              https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || true)
+            echo "Attempt $i -> HTTP $code"
+            if [ "$code" = "200" ]; then
+              echo "API is up."
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error::/health did not return 200 after the deploy."
+          exit 1
+
+# -----------------------------------------------------------------------------
+#  NOTE ON MIGRATIONS
+#  This workflow deliberately does NOT run database migrations. On the Free tier
+#  you run them by hand from your laptop, as the smopmo_migrator role, because:
+#    - the API connects as smopmo_app, which has no permission to change schema
+#    - automated migration jobs exist to stop several app instances racing to
+#      migrate at once, and on Free you only ever have one instance
+#  When you move to Container Apps with more than one replica, add a migration
+#  step here that runs BEFORE the deploy step and fails the run on error.
+# -----------------------------------------------------------------------------
