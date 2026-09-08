@@ -182,6 +182,22 @@ export function FlagIcon(props: IconProps) {
   );
 }
 
+export function AlertTriangleIcon(props: IconProps) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" {...props}>
+      <path
+        d="M8 2.4 14.2 13H1.8z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <line x1="8" y1="6.4" x2="8" y2="9.4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <circle cx="8" cy="11.3" r="0.75" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function PresentationIcon(props: IconProps) {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" {...props}>

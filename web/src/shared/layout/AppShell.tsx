@@ -8,6 +8,7 @@ import { supportedLanguages } from '../i18n/i18n';
 import { useTheme } from '../theme/useTheme';
 import './AppShell.css';
 import {
+  AlertTriangleIcon,
   BellIcon,
   BreadcrumbSepIcon,
   ChevronIcon,
@@ -65,6 +66,7 @@ const workspaceNavItems: Record<WorkspaceId, NavEntry[]> = {
     { to: '/pmo/home', key: 'nav.projectsOverview', end: true, Icon: FolderIcon },
     { to: '/pmo/portfolios', key: 'nav.portfolios', Icon: LayersIcon },
     { to: '/pmo/programs', key: 'nav.programs', Icon: ListIcon },
+    { to: '/pmo/risk', key: 'nav.risk', Icon: AlertTriangleIcon },
   ],
   executive: [{ to: '/executive/home', key: 'nav.executiveDashboard', end: true, Icon: PresentationIcon }],
 };
