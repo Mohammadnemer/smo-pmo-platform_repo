@@ -47,7 +47,7 @@ app.UseMiddleware<TenantResolutionMiddleware>();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<PlatformDbContext>();
-    await dbContext.Database.MigrateAsync();
+    // await dbContext.Database.MigrateAsync();
 
     // Each module migrates its own tables; SMO, PMO and Rollup each keep a separate
     // migration ledger (B5, B6, X1).
@@ -83,6 +83,7 @@ using (var scope = app.Services.CreateScope())
         var rollupDbContext = scope.ServiceProvider.GetRequiredService<RollupDbContext>();
         await RollupDemoSeed.SeedAsync(rollupDbContext, smoDbContext, pmoDbContext);
     }
+
 }
 
 // Liveness probe — used by the Container App (T2) and CI smoke test (T3).
