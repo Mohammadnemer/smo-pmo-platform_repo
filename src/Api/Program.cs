@@ -104,7 +104,12 @@ app.MapGet("/health", health);
 // stays for infra that curls the container directly).
 app.MapGet("/api/health", health);
 
-app.MapGet("/me", [Authorize]() => Results.Ok(new { authenticated = true })).RequireAuthorization();
+app.MapGet("/me", (HttpContext http) => Results.Ok(new
+{
+    authenticated = true,
+    roles = http.User.Claims.Where(c => c.Type is "role" or "roles").Select(c => c.Value).ToArray(),
+    claims = http.User.Claims.Select(c => new { c.Type, c.Value })
+})).RequireAuthorization();
 app.MapGet("/admin", [Authorize(Policy = "AdminPolicy")] () => Results.Ok(new { authorized = true })).RequireAuthorization();
 
 // Each module maps its own routes; /Api only calls them (B5 replaced the throwaway
