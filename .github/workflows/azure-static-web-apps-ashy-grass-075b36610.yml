@@ -15,19 +15,25 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: false
           lfs: false
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
+        env:
+          # Vite bakes these into the bundle at BUILD time. Changing them in the
+          # Azure portal afterwards has no effect — the values are already
+          # compiled into the JavaScript. Only a rebuild picks up a change.
+          VITE_API_BASE_URL: https://smopmo-api-dra5esb8hye9d3ev.swedencentral-01.azurewebsites.net
+          VITE_ENTRA_CLIENT_ID: 24bc7cc3-715c-4ccb-86cc-3a3c02c1709e
+          VITE_ENTRA_AUTHORITY: https://login.microsoftonline.com/1fa395ad-1f77-409c-a4d9-9b9fd699bb1f
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_GRASS_075B36610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
+          ###### Repository/Build Configurations ######
           app_location: "./web" # App source code path
           api_location: "" # Api source code path - optional
           output_location: "dist" # Built app content directory - optional
