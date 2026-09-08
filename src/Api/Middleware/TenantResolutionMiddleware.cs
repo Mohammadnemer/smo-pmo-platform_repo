@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 using SmoPmo.Platform;
 using SmoPmo.Shared.Multitenancy;
 
@@ -8,10 +10,12 @@ namespace SmoPmo.Api.Middleware;
 public sealed class TenantResolutionMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<TenantResolutionMiddleware> _logger;
 
-    public TenantResolutionMiddleware(RequestDelegate next)
+    public TenantResolutionMiddleware(RequestDelegate next, ILogger<TenantResolutionMiddleware> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     // ITenantContext is resolved per invocation, not in the constructor: middleware itself is
@@ -42,12 +46,24 @@ public sealed class TenantResolutionMiddleware
 
                 if (!string.IsNullOrWhiteSpace(externalId))
                 {
-                    var resolved = await platformDb.Database
-                        .SqlQueryRaw<Guid?>("SELECT app.resolve_tenant_id({0}) AS \"Value\"", externalId)
-                        .FirstOrDefaultAsync(context.RequestAborted);
-                    if (resolved is { } resolvedTenantId)
+                    try
                     {
-                        tenantContext.TenantId = resolvedTenantId;
+                        var resolved = await platformDb.Database
+                            .SqlQueryRaw<Guid?>("SELECT app.resolve_tenant_id({0}) AS \"Value\"", externalId)
+                            .FirstOrDefaultAsync(context.RequestAborted);
+                        if (resolved is { } resolvedTenantId)
+                        {
+                            tenantContext.TenantId = resolvedTenantId;
+                        }
+                    }
+                    catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UndefinedFunction)
+                    {
+                        // AddUserTenantResolutionFunction hasn't been hand-applied to this
+                        // database yet (deploy-api.yml never runs migrations). Degrade to the
+                        // same "tenant unresolved" state as before this fallback existed,
+                        // rather than 500ing every authenticated request until someone runs it.
+                        _logger.LogWarning(ex,
+                            "app.resolve_tenant_id is missing — has docs/sql/2026-09-08-add-user-tenant-resolution-function.sql been applied?");
                     }
                 }
             }

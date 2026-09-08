@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using SmoPmo.Api.Middleware;
 using SmoPmo.Platform;
 using SmoPmo.Shared.Multitenancy;
@@ -14,6 +15,9 @@ public sealed class TenantResolutionTests
         new DbContextOptionsBuilder<PlatformDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options);
+
+    private static TenantResolutionMiddleware NewMiddleware(RequestDelegate next) =>
+        new(next, NullLogger<TenantResolutionMiddleware>.Instance);
 
     [Fact]
     public async Task MiddlewareSetsTenantFromJwtClaim()
@@ -36,7 +40,7 @@ public sealed class TenantResolutionTests
 
         // The tenant context is passed per invocation, not captured in the constructor
         // (B5): middleware is effectively a singleton and must not hold one request's tenant.
-        var middleware = new TenantResolutionMiddleware(next);
+        var middleware = NewMiddleware(next);
         await using var platformDb = NewPlatformDb();
         await middleware.InvokeAsync(context, tenantContext, platformDb);
 
@@ -58,7 +62,7 @@ public sealed class TenantResolutionTests
         context.Request.Headers.Authorization = "Bearer test-token";
         context.User = new ClaimsPrincipal(new ClaimsIdentity(Array.Empty<Claim>(), "Test"));
 
-        var middleware = new TenantResolutionMiddleware(_ => Task.CompletedTask);
+        var middleware = NewMiddleware(_ => Task.CompletedTask);
         await middleware.InvokeAsync(context, tenantContext, platformDb);
 
         Assert.Equal(Guid.Empty, tenantContext.TenantId);
