@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from '../auth/ProtectedRoute';
 import { HomePage } from '../modules/platform/pages/HomePage';
 import { NotificationsPage } from '../modules/notifications/pages/NotificationsPage';
+import { IssuesPage } from '../modules/pmo/pages/IssuesPage';
 import { PortfoliosPage } from '../modules/pmo/pages/PortfoliosPage';
 import { ProgramsPage } from '../modules/pmo/pages/ProgramsPage';
 import { ProjectsPage } from '../modules/pmo/pages/ProjectsPage';
@@ -37,6 +38,7 @@ export function AppRouter() {
             <Route path="/pmo/portfolios" element={<PortfoliosPage />} />
             <Route path="/pmo/programs" element={<ProgramsPage />} />
             <Route path="/pmo/risk" element={<RiskPage />} />
+            <Route path="/pmo/issues" element={<IssuesPage />} />
             <Route path="/pmo/projects/:id" element={<ProjectWorkspacePage />} />
 
             <Route path="/executive" element={<Navigate to="/executive/home" replace />} />
