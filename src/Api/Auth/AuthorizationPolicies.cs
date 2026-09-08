@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using SmoPmo.Shared.Multitenancy;
 
@@ -33,7 +34,11 @@ public sealed class AuthorizationHandler : AuthorizationHandler<AuthorizationReq
 
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AuthorizationRequirement requirement)
     {
-        var roles = context.User.Claims.Where(x => x.Type == "role" || x.Type == "roles")
+        // Azure AD/Entra emits app roles under the "roles" claim, but ASP.NET Core's
+        // default JWT inbound claim mapping renames the singular "role" (and, in
+        // practice, Entra's own role claim) to the long ClaimTypes.Role URI before this
+        // handler ever sees it — check all three shapes rather than relying on one.
+        var roles = context.User.Claims.Where(x => x.Type == "role" || x.Type == "roles" || x.Type == ClaimTypes.Role)
             .Select(x => x.Value)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
