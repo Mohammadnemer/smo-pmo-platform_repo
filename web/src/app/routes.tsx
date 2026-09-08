@@ -6,6 +6,7 @@ import { PortfoliosPage } from '../modules/pmo/pages/PortfoliosPage';
 import { ProgramsPage } from '../modules/pmo/pages/ProgramsPage';
 import { ProjectsPage } from '../modules/pmo/pages/ProjectsPage';
 import { ProjectWorkspacePage } from '../modules/pmo/pages/ProjectWorkspacePage';
+import { RiskPage } from '../modules/pmo/pages/RiskPage';
 import { ExecutivePage } from '../modules/rollup/pages/ExecutivePage';
 import { RollupPage } from '../modules/rollup/pages/RollupPage';
 import { InitiativesPage } from '../modules/smo/pages/InitiativesPage';
@@ -33,6 +34,7 @@ export function AppRouter() {
             <Route path="/pmo/home" element={<ProjectsPage />} />
             <Route path="/pmo/portfolios" element={<PortfoliosPage />} />
             <Route path="/pmo/programs" element={<ProgramsPage />} />
+            <Route path="/pmo/risk" element={<RiskPage />} />
             <Route path="/pmo/projects/:id" element={<ProjectWorkspacePage />} />
 
             <Route path="/executive" element={<Navigate to="/executive/home" replace />} />
