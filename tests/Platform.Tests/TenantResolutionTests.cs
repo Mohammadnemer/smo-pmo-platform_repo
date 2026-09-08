@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using SmoPmo.Api.Middleware;
 using SmoPmo.Platform;
@@ -16,8 +17,10 @@ public sealed class TenantResolutionTests
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options);
 
-    private static TenantResolutionMiddleware NewMiddleware(RequestDelegate next) =>
-        new(next, NullLogger<TenantResolutionMiddleware>.Instance);
+    private static IConfiguration EmptyConfig() => new ConfigurationBuilder().Build();
+
+    private static TenantResolutionMiddleware NewMiddleware(RequestDelegate next, IConfiguration? configuration = null) =>
+        new(next, NullLogger<TenantResolutionMiddleware>.Instance, configuration ?? EmptyConfig());
 
     [Fact]
     public async Task MiddlewareSetsTenantFromJwtClaim()
@@ -66,5 +69,28 @@ public sealed class TenantResolutionTests
         await middleware.InvokeAsync(context, tenantContext, platformDb);
 
         Assert.Equal(Guid.Empty, tenantContext.TenantId);
+    }
+
+    [Fact]
+    public async Task MiddlewareFallsBackToConfiguredDemoTenantWhenUnresolved()
+    {
+        // Temporary demo fallback (see the comment on TenantResolutionMiddleware's field):
+        // an authenticated caller with no resolvable tenant lands in DefaultTenantId instead
+        // of staying unresolved, while this is configured.
+        var demoTenantId = Guid.Parse("00000000-0000-0000-0000-0000000000aa");
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?> { ["DefaultTenantId"] = demoTenantId.ToString() })
+            .Build();
+
+        await using var platformDb = NewPlatformDb();
+        var tenantContext = new TenantContext();
+        var context = new DefaultHttpContext();
+        context.Request.Headers.Authorization = "Bearer test-token";
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(Array.Empty<Claim>(), "Test"));
+
+        var middleware = NewMiddleware(_ => Task.CompletedTask, configuration);
+        await middleware.InvokeAsync(context, tenantContext, platformDb);
+
+        Assert.Equal(demoTenantId, tenantContext.TenantId);
     }
 }

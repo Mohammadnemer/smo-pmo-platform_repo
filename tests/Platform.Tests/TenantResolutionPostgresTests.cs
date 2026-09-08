@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 using SmoPmo.Api.Middleware;
@@ -82,7 +83,10 @@ public sealed class TenantResolutionPostgresTests
             new Claim("oid", "entra-oid-1")
         }, "Test"));
 
-        var middleware = new TenantResolutionMiddleware(_ => Task.CompletedTask, NullLogger<TenantResolutionMiddleware>.Instance);
+        var middleware = new TenantResolutionMiddleware(
+            _ => Task.CompletedTask,
+            NullLogger<TenantResolutionMiddleware>.Instance,
+            new ConfigurationBuilder().Build());
         await middleware.InvokeAsync(context, tenantContext, platformDb);
 
         Assert.Equal(tenantId, tenantContext.TenantId);

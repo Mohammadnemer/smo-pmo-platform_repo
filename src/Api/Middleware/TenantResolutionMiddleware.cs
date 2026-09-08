@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SmoPmo.Platform;
 using SmoPmo.Shared.Multitenancy;
@@ -11,10 +12,20 @@ public sealed class TenantResolutionMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<TenantResolutionMiddleware> _logger;
 
-    public TenantResolutionMiddleware(RequestDelegate next, ILogger<TenantResolutionMiddleware> logger)
+    // TEMPORARY DEMO FALLBACK (2026-09-08) — remove once every real login resolves a tenant
+    // through app.resolve_tenant_id, i.e. once docs/sql/2026-09-08-add-user-tenant-resolution-
+    // function.sql has been hand-applied and Users rows exist for real logins. Until then, an
+    // authenticated caller who can't be resolved lands in this configured tenant instead of
+    // seeing nothing — at the cost of tenant isolation for *any* unresolved caller, not just
+    // the person this was added for. Acceptable only because this is a single-tenant demo
+    // deployment right now; must not survive past that.
+    private readonly Guid? _demoFallbackTenantId;
+
+    public TenantResolutionMiddleware(RequestDelegate next, ILogger<TenantResolutionMiddleware> logger, IConfiguration configuration)
     {
         _next = next;
         _logger = logger;
+        _demoFallbackTenantId = Guid.TryParse(configuration["DefaultTenantId"], out var demoTenantId) ? demoTenantId : null;
     }
 
     // ITenantContext is resolved per invocation, not in the constructor: middleware itself is
@@ -69,6 +80,11 @@ public sealed class TenantResolutionMiddleware
                             externalId);
                     }
                 }
+            }
+
+            if (tenantContext.TenantId == Guid.Empty && _demoFallbackTenantId is { } fallbackTenantId)
+            {
+                tenantContext.TenantId = fallbackTenantId;
             }
         }
 
