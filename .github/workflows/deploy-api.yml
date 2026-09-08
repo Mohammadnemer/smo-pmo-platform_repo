@@ -13,11 +13,7 @@
 # =============================================================================
 
 name: Deploy API
-env:
-  AZURE_WEBAPP_NAME: smopmo-api
-  AZURE_WEBAPP_HOSTNAME: smopmo-api-dra5esb8hye9d3ev.swedencentral-01.azurewebsites.net
-  API_PROJECT: src/Api/Api.csproj
-  DOTNET_VERSION: '10.x'
+
 on:
   push:
     branches: [master]
@@ -27,7 +23,8 @@ on:
   workflow_dispatch: # lets you trigger a deploy manually from the UI
 
 env:
-  AZURE_WEBAPP_NAME: smopmo-api # <-- change to your App Service name
+  AZURE_WEBAPP_NAME: smopmo-api
+  AZURE_WEBAPP_HOSTNAME: smopmo-api-dra5esb8hye9d3ev.swedencentral-01.azurewebsites.net
   API_PROJECT: src/Api/Api.csproj
   DOTNET_VERSION: "10.x"
 
@@ -83,7 +80,7 @@ jobs:
           sleep 30
           for i in 1 2 3 4 5; do
             code=$(curl -s -o /dev/null -w "%{http_code}" \
-              https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || true)
+              https://${{ env.AZURE_WEBAPP_HOSTNAME }}/health || true)
             echo "Attempt $i -> HTTP $code"
             if [ "$code" = "200" ]; then
               echo "API is up."
