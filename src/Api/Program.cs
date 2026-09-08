@@ -51,9 +51,9 @@ using (var scope = app.Services.CreateScope())
 
     // Each module migrates its own tables; SMO, PMO and Rollup each keep a separate
     // migration ledger (B5, B6, X1).
-    await scope.ServiceProvider.GetRequiredService<SmoDbContext>().Database.MigrateAsync();
-    await scope.ServiceProvider.GetRequiredService<PmoDbContext>().Database.MigrateAsync();
-    await scope.ServiceProvider.GetRequiredService<RollupDbContext>().Database.MigrateAsync();
+    // await scope.ServiceProvider.GetRequiredService<SmoDbContext>().Database.MigrateAsync();
+    // await scope.ServiceProvider.GetRequiredService<PmoDbContext>().Database.MigrateAsync();
+    // await scope.ServiceProvider.GetRequiredService<RollupDbContext>().Database.MigrateAsync();
 
     var tenantId = Guid.Parse(app.Configuration["DefaultTenantId"] ?? "00000000-0000-0000-0000-000000000001");
     var tenantName = app.Configuration["DefaultTenantName"] ?? "Default Tenant";
