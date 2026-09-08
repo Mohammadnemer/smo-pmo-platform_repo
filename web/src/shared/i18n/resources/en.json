@@ -9,6 +9,7 @@
     "projectsOverview": "Projects",
     "portfolios": "Portfolios",
     "programs": "Programs",
+    "risk": "Risk",
     "executiveDashboard": "Dashboard",
     "workflow": "Workflow",
     "rollup": "Roll-up",
@@ -155,6 +156,13 @@
         "create": "Create program",
         "creating": "Creating…",
         "error": "Could not create the program."
+      }
+    },
+    "risk": {
+      "title": "Risk",
+      "register": {
+        "title": "Risk register",
+        "empty": "The risk register is not wired up yet — risks are logged on each project’s RAID board for now."
       }
     },
     "projectWorkspace": {

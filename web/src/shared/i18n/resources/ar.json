@@ -9,6 +9,7 @@
     "projectsOverview": "المشاريع",
     "portfolios": "المحافظ",
     "programs": "البرامج",
+    "risk": "المخاطر",
     "executiveDashboard": "لوحة المعلومات",
     "workflow": "مسار العمل",
     "rollup": "التجميع",
@@ -155,6 +156,13 @@
         "create": "إنشاء البرنامج",
         "creating": "جارٍ الإنشاء…",
         "error": "تعذّر إنشاء البرنامج."
+      }
+    },
+    "risk": {
+      "title": "المخاطر",
+      "register": {
+        "title": "سجل المخاطر",
+        "empty": "لم يُربط سجل المخاطر بعد — تُسجَّل المخاطر حالياً في لوحة RAID الخاصة بكل مشروع."
       }
     },
     "projectWorkspace": {
