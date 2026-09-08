@@ -16,16 +16,16 @@ name: Deploy API
 
 on:
   push:
-    branches: [ main ]
+    branches: [master]
     paths:
-      - 'src/**'
-      - '.github/workflows/deploy-api.yml'
-  workflow_dispatch:        # lets you trigger a deploy manually from the UI
+      - "src/**"
+      - ".github/workflows/deploy-api.yml"
+  workflow_dispatch: # lets you trigger a deploy manually from the UI
 
 env:
-  AZURE_WEBAPP_NAME: smopmo-api        # <-- change to your App Service name
+  AZURE_WEBAPP_NAME: smopmo-api # <-- change to your App Service name
   API_PROJECT: src/Api/Api.csproj
-  DOTNET_VERSION: '10.x'
+  DOTNET_VERSION: "10.x"
 
 jobs:
   build-and-deploy:
