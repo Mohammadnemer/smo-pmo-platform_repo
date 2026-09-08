@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,16 @@ public static class AuthenticationExtensions
     {
         var authority = configuration["Authentication:Authority"] ?? "https://login.microsoftonline.com/tenant-id/v2.0";
         var audience = configuration["Authentication:Audience"] ?? "api://smo-pmo-platform";
+        var clientId = configuration["Authentication:ClientId"];
         var requireHttpsMetadata = configuration.GetValue("Authentication:RequireHttpsMetadata", true);
+
+        // v1.0 access tokens carry `aud` as the API's App ID URI; v2.0 tokens (set via
+        // accessTokenAcceptedVersion: 2 on the app registration) carry `aud` as the app's
+        // plain client ID GUID instead. Accept either so a manifest/token-version change
+        // on the Entra side doesn't silently 401 every request again.
+        var validAudiences = new[] { audience, clientId }
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .ToArray();
 
         // The real Entra External ID tenant/app registration is a deferred follow-up
         // (F1/F2) — until it exists, JwtBearer alone 401s every local call, which is what
@@ -38,12 +48,12 @@ public static class AuthenticationExtensions
         authBuilder.AddJwtBearer(options =>
             {
                 options.Authority = authority;
-                options.Audience = audience;
                 options.RequireHttpsMetadata = requireHttpsMetadata;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = !string.IsNullOrWhiteSpace(authority),
-                    ValidateAudience = !string.IsNullOrWhiteSpace(audience),
+                    ValidateAudience = validAudiences.Length > 0,
+                    ValidAudiences = validAudiences,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = false
                 };
