@@ -45,51 +45,18 @@ public sealed class TenantResolutionTests
     }
 
     [Fact]
-    public async Task MiddlewareResolvesTenantFromUsersTableWhenTokenHasNoTenantClaim()
+    public async Task MiddlewareLeavesTenantUnsetWhenNoTenantClaimAndNoExternalIdClaimEither()
     {
-        // Mirrors a real Entra External ID token: no tenant_id claim, only the stable "oid"
-        // object id — the shape TenantResolutionMiddleware falls back to once B2's
-        // custom-claim mapping turns out not to exist.
-        var expectedTenantId = Guid.Parse("00000000-0000-0000-0000-000000000456");
-
-        await using var platformDb = NewPlatformDb();
-        platformDb.Users.Add(new User
-        {
-            Id = Guid.NewGuid(),
-            TenantId = expectedTenantId,
-            ExternalId = "entra-oid-1",
-            Email = "user@example.com",
-            DisplayName = "Test User",
-            CreatedAt = DateTimeOffset.UtcNow,
-            CreatedBy = "test"
-        });
-        await platformDb.SaveChangesAsync();
-
-        var tenantContext = new TenantContext();
-        var context = new DefaultHttpContext();
-        context.Request.Headers.Authorization = "Bearer test-token";
-        context.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-        {
-            new Claim("oid", "entra-oid-1")
-        }, "Test"));
-
-        var middleware = new TenantResolutionMiddleware(_ => Task.CompletedTask);
-        await middleware.InvokeAsync(context, tenantContext, platformDb);
-
-        Assert.Equal(expectedTenantId, tenantContext.TenantId);
-    }
-
-    [Fact]
-    public async Task MiddlewareLeavesTenantUnsetWhenNoClaimAndNoMatchingUser()
-    {
+        // No tenant_id, no oid/sub/NameIdentifier either — the fallback has nothing to look
+        // up, so it must short-circuit before touching the database. Verified by using an
+        // in-memory PlatformDbContext that would throw on the raw SQL the real fallback issues
+        // (app.resolve_tenant_id is Postgres-only — see TenantResolutionPostgresTests for the
+        // path that actually calls it).
         await using var platformDb = NewPlatformDb();
         var tenantContext = new TenantContext();
         var context = new DefaultHttpContext();
         context.Request.Headers.Authorization = "Bearer test-token";
-        context.User = new ClaimsPrincipal(new ClaimsIdentity(new[]
-        {
-            new Claim("oid", "unknown-oid")
-        }, "Test"));
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(Array.Empty<Claim>(), "Test"));
 
         var middleware = new TenantResolutionMiddleware(_ => Task.CompletedTask);
         await middleware.InvokeAsync(context, tenantContext, platformDb);
