@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using SmoPmo.Platform;
 using SmoPmo.Shared.Multitenancy;
 
@@ -56,14 +55,18 @@ public sealed class TenantResolutionMiddleware
                             tenantContext.TenantId = resolvedTenantId;
                         }
                     }
-                    catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UndefinedFunction)
+                    catch (Exception ex) when (ex is not OperationCanceledException)
                     {
-                        // AddUserTenantResolutionFunction hasn't been hand-applied to this
-                        // database yet (deploy-api.yml never runs migrations). Degrade to the
-                        // same "tenant unresolved" state as before this fallback existed,
-                        // rather than 500ing every authenticated request until someone runs it.
+                        // Best-effort enrichment, not a required step: app.resolve_tenant_id
+                        // might not exist yet (deploy-api.yml never runs migrations — see
+                        // docs/sql/2026-09-08-add-user-tenant-resolution-function.sql), the
+                        // connection might be down, or Postgres might reject the call for a
+                        // reason narrower catches keep missing. Whatever the cause, degrade to
+                        // the same "tenant unresolved" state the rest of the app already
+                        // handles rather than 500ing every authenticated request over it.
                         _logger.LogWarning(ex,
-                            "app.resolve_tenant_id is missing — has docs/sql/2026-09-08-add-user-tenant-resolution-function.sql been applied?");
+                            "Failed to resolve tenant via app.resolve_tenant_id for external id {ExternalId}",
+                            externalId);
                     }
                 }
             }
