@@ -10,6 +10,11 @@ namespace SmoPmo.Platform.Migrations;
 /// PlatformDbContext has always had DbSets for both, and it named the task/RAID tables
 /// "Tasks"/"RAID" instead of the "TaskItems"/"RaidItems" EF's DbSet-name convention expects.
 /// Filling that in here rather than editing the already-applied D3 migration.
+///
+/// D3 itself became a no-op once B6 moved Tasks/RAID ownership to the PMO module, so on any
+/// database that never ran the original (pre-B6) D3, "Tasks"/"RAID" never exist — the renames
+/// below are guarded with an existence check so this migration is a clean no-op for those
+/// (e.g. a fresh database) while still fixing up old pre-B6 databases that do have them.
 /// </summary>
 [DbContext(typeof(PlatformDbContext))]
 [Migration("20260730035000_AddLookupAndAuditEntriesTables")]
@@ -17,8 +22,17 @@ public partial class AddLookupAndAuditEntriesTables : Migration
 {
     protected override void Up(MigrationBuilder migrationBuilder)
     {
-        migrationBuilder.RenameTable(name: "Tasks", newName: "TaskItems");
-        migrationBuilder.RenameTable(name: "RAID", newName: "RaidItems");
+        migrationBuilder.Sql(@"
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'Tasks') THEN
+                    ALTER TABLE ""Tasks"" RENAME TO ""TaskItems"";
+                END IF;
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'RAID') THEN
+                    ALTER TABLE ""RAID"" RENAME TO ""RaidItems"";
+                END IF;
+            END $$;
+        ");
 
         migrationBuilder.CreateTable(
             name: "LookupItems",
@@ -70,7 +84,17 @@ public partial class AddLookupAndAuditEntriesTables : Migration
     {
         migrationBuilder.DropTable(name: "AuditEntries");
         migrationBuilder.DropTable(name: "LookupItems");
-        migrationBuilder.RenameTable(name: "RaidItems", newName: "RAID");
-        migrationBuilder.RenameTable(name: "TaskItems", newName: "Tasks");
+
+        migrationBuilder.Sql(@"
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'TaskItems') THEN
+                    ALTER TABLE ""TaskItems"" RENAME TO ""Tasks"";
+                END IF;
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'RaidItems') THEN
+                    ALTER TABLE ""RaidItems"" RENAME TO ""RAID"";
+                END IF;
+            END $$;
+        ");
     }
 }
