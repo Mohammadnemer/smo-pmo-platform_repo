@@ -29,6 +29,7 @@ jobs:
           VITE_API_BASE_URL: https://rg-smopmo-api-d0g3b2c9fkceddft.swedencentral-01.azurewebsites.net
           VITE_ENTRA_CLIENT_ID: 24bc7cc3-715c-4ccb-86cc-3a3c02c1709e
           VITE_ENTRA_AUTHORITY: https://login.microsoftonline.com/1fa395ad-1f77-409c-a4d9-9b9fd699bb1f
+          VITE_API_SCOPE: api://1fa395ad-1f77-409c-a4d9-9b9fd699bb1f/smo-pmo-platform/access_as_user
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_GRASS_075B36610 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
