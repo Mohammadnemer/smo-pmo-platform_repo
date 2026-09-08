@@ -13,7 +13,11 @@
 # =============================================================================
 
 name: Deploy API
-
+env:
+  AZURE_WEBAPP_NAME: smopmo-api
+  AZURE_WEBAPP_HOSTNAME: smopmo-api-dra5esb8hye9d3ev.swedencentral-01.azurewebsites.net
+  API_PROJECT: src/Api/Api.csproj
+  DOTNET_VERSION: '10.x'
 on:
   push:
     branches: [master]
